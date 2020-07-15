@@ -16,6 +16,22 @@ const errorFormatter = ({ location, msg, param, value, nestedErrors }) => {
   return [`${msg}`];
 };
 
+const errorHandler = (err, req, res, next) => {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get("env") === "development" ? err : {};
+
+  console.log(err);
+
+  if (err.name === "CastError") {
+    res.status(404).json({ error: "Invalid Object Id." });
+  }
+
+  // render the error page
+  res.status(err.status || 500);
+  res.json({ error: err.message });
+};
 const _ErrorResponse = ErrorResponse;
+export { errorHandler };
 export { _ErrorResponse as ErrorResponse };
 export const errorFormater = errorFormatter;

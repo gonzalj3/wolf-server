@@ -35,6 +35,16 @@ const User = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  currentGame: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Game",
+  },
+  games: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "Game",
+    },
+  ],
 });
 
 /* @desc: Before saving the user instance/document the password is hashed.

@@ -1,4 +1,4 @@
-import User from "../models/teacher.js";
+import User from "../models/User.js";
 import { ErrorResponse, errorFormater } from "../util/errorResponse.js";
 import { accessToken } from "../util/tokens.js";
 import expressValidator from "express-validator";

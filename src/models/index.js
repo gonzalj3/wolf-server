@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config();
 
-import Teacher from "./teacher.js";
+import Teacher from "./User.js";
 
 const connectDB = () => {
   console.log(process.env.DATABASE_URL);

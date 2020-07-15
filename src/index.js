@@ -8,7 +8,8 @@ import jsonwebtoken from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
 
 import router from "./routes/autRoutes.js";
-
+import gameRouter from "./routes/game.js";
+import { errorHandler } from "./util/errorResponse.js";
 const { verify } = jsonwebtoken;
 const { hash, compare } = bcryptjs;
 const { json, urlencoded } = express;
@@ -33,6 +34,8 @@ app.use(
 );*/
 
 app.use("/api", router);
+app.use("/api/game/", gameRouter);
+app.use(errorHandler);
 /*app.post("/register", async (req, res) => {
   const { email, password } = req.body;
   try {
