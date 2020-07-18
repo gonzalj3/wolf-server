@@ -1,14 +1,11 @@
-import Game from "../models/Game.js";
-import User from "../models/User.js";
-import Team from "../models/Team.js";
-import Player from "../models/Player.js";
-//import initialData from "../../test/dummyData.js";
-//import initialData from "../data/initial-data.js";
+import models, { connectDB } from "../src/models/index.js";
+import Game from "../src/models/Game.js";
+import Team from "../src/models/Team.js";
+import Player from "../src/models/Player.js";
 
-const currentGame = async (req, res, next) => {
-  //let initialData;
-  let games = [];
-
+let games = [];
+let initialData;
+connectDB().then(async () => {
   const player = await Player.create({
     name: "Test",
     queries: [],
@@ -70,15 +67,12 @@ const currentGame = async (req, res, next) => {
     returnData.droppable.roster.students
   );
   console.log("returnData", returnData);
-  //initialData = returnData;
-  //console.log("initialData", initialData);
-  /*console.log(req);
-  const output = {};
-  output.hello = "world";
-  console.log(output);
-  res.status(200).json(initialData);*/
-  console.log("sending data", returnData, "just sent");
-  res.status(200).json(returnData);
-};
+  initialData = returnData;
+  console.log("initialData", initialData);
+});
+export default initialData;
 
-export { currentGame };
+/*returnData.droppable = {
+
+  }*/
+//console.log(team);

@@ -4,10 +4,15 @@ import mongoose from "mongoose";
  */
 
 const Game = new mongoose.Schema({
+  gameCode: {
+    type: String,
+    required: [true, "is required"],
+    index: { unique: true },
+  },
   roster: [
     {
-      type: mongoose.Schema.ObjectId,
-      ref: "Player",
+      id: String,
+      name: String,
     },
   ],
   teams: [

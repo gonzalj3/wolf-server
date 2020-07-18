@@ -4,10 +4,9 @@ import mongoose from "mongoose";
  */
 
 const Team = new mongoose.Schema({
-  teamRoster: [
+  students: [
     {
-      type: mongoose.Schema.ObjectId,
-      ref: "Player",
+      type: String,
     },
   ],
   color: {
