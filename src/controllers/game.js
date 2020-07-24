@@ -7,35 +7,16 @@ import Player from "../models/Player.js";
 
 const currentGame = async (req, res, next) => {
   //let initialData;
-  let games = [];
+  console.log("req user", req.user);
+  let exist = await User.findOne({
+    email: req.user.email,
+  });
+  let currentGame = exist.currentGame;
+  console.log("currentGame", currentGame);
+  let gameFound = await Game.findById(currentGame);
 
-  const player = await Player.create({
-    name: "Test",
-    queries: [],
-  });
-  const playerID = player._id;
-  console.log("playerID 1", playerID);
-  let roster = { id: playerID, name: player.name };
-  console.log("playerID 2", playerID);
+  console.log("gamefound", gameFound);
 
-  const team = await Team.create({
-    students: [playerID],
-    color: "blue",
-    name: "blue",
-    score: 2,
-  });
-  console.log("playerID in team stduens", team.students);
-  console.log("roster", roster);
-  const game = await Game.create({
-    gameCode: 44488,
-    roster: [roster],
-    teams: [team],
-    queries: [],
-  });
-  console.log("game roster", game.roster);
-  games.push(game);
-  //We will take the last added game in User's games array.
-  const gameFound = await Game.findById(games[games.length - 1]);
   let returnData = {
     droppable: {},
     TeamOrder: [],
