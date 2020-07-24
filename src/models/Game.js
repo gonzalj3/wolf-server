@@ -7,6 +7,8 @@ const Game = new mongoose.Schema({
   gameCode: {
     type: String,
     required: [true, "is required"],
+    maxlength: [6, "game code can not be greater than 6 characters"],
+    minlength: [4, "game code can not be less than 4 characters"],
     index: { unique: true },
   },
   roster: [

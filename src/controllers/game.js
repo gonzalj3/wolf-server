@@ -13,31 +13,37 @@ const currentGame = async (req, res, next) => {
     name: "Test",
     queries: [],
   });
+  const playerID = player._id;
+  console.log("playerID 1", playerID);
+  let roster = { id: playerID, name: player.name };
+  console.log("playerID 2", playerID);
 
   const team = await Team.create({
-    students: [player.name],
+    students: [playerID],
     color: "blue",
     name: "blue",
     score: 2,
   });
-
+  console.log("playerID in team stduens", team.students);
+  console.log("roster", roster);
   const game = await Game.create({
-    gameCode: 234,
-    roster: [{ id: player._id, name: player.name }],
+    gameCode: 44488,
+    roster: [roster],
     teams: [team],
     queries: [],
   });
-  //console.log(game);
+  console.log("game roster", game.roster);
   games.push(game);
   //We will take the last added game in User's games array.
   const gameFound = await Game.findById(games[games.length - 1]);
   let returnData = {
     droppable: {},
     TeamOrder: [],
+    gameCode: gameFound.gameCode,
   };
   //let droppable = {};
   for (const teamID of gameFound.teams) {
-    console.log("teamID", teamID);
+    //console.log("teamID", teamID);
     let name = await Team.findById(teamID);
     returnData.droppable = {
       [name.name]: {
@@ -52,8 +58,9 @@ const currentGame = async (req, res, next) => {
   }
   returnData.students = {};
   gameFound.roster.forEach((element) => {
-    returnData.students[element._id] = {
-      id: element._id,
+    console.log(returnData.students, "insideforeach", element._id);
+    returnData.students[element.id] = {
+      id: element.id,
       name: element.name,
     };
   });
@@ -63,7 +70,7 @@ const currentGame = async (req, res, next) => {
 
   returnData.droppable.roster.students = [];
   gameFound.roster.forEach((element) => {
-    returnData.droppable.roster.students.push(element.name);
+    returnData.droppable.roster.students.push(element.id);
   });
   console.log(
     "droppable.roster.students",
