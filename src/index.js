@@ -9,6 +9,7 @@ import bcryptjs from "bcryptjs";
 
 import router from "./routes/autRoutes.js";
 import gameRouter from "./routes/game.js";
+import joinGameRouter from "./routes/joinGame.js";
 import { errorHandler } from "./util/errorResponse.js";
 const { verify } = jsonwebtoken;
 const { hash, compare } = bcryptjs;
@@ -35,6 +36,7 @@ app.use(
 
 app.use("/api", router);
 app.use("/api/game/", gameRouter);
+app.use("/api/joinGame/", joinGameRouter);
 app.use(errorHandler);
 
 connectDB().then(async () => {

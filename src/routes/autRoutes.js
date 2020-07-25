@@ -34,6 +34,6 @@ router.post(
   logInController
 );
 
-router.post("/joinGame", joinGameController);
+//router.post("/joinGame", joinGameController);
 
 export default router;
