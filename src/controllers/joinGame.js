@@ -8,6 +8,10 @@ const joinGame = async (req, res, next) => {
   });
 
   console.log("we have a game", game);
+  let returnData = {
+    we: "good",
+  };
+  res.status(200).json(returnData);
 };
 
 export { joinGame };
