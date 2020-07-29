@@ -7,14 +7,24 @@ import Player from "../models/Player.js";
 
 const currentGame = async (req, res, next) => {
   //let initialData;
-  console.log("req user", req.user);
-  let exist = await User.findOne({
-    email: req.user.email,
-  });
-  let currentGame = exist.currentGame;
-  console.log("currentGame", currentGame);
-  let gameFound = await Game.findById(currentGame);
+  let gameFound = null;
 
+  console.log("req gameCode", req.body.gameCode);
+  //console.log("request received", req);
+  //If we dont have a gameCode in the request then we are a teacher setting up a game.
+  if (req.body.gameCode) {
+    gameFound = await Game.findOne({
+      gameCode: req.body.gameCode,
+    });
+    console.log("gameFound", gameFound);
+  } else {
+    let exist = await User.findOne({
+      email: req.user.email,
+    });
+    let currentGame = exist.currentGame;
+    console.log("currentGame", currentGame);
+    gameFound = await Game.findById(currentGame);
+  }
   console.log("gamefound", gameFound);
 
   let returnData = {
