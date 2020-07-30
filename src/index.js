@@ -1,24 +1,24 @@
 import express from "express";
-import websocket from "websocket";
 import socketio from "socket.io";
 import http from "http";
 import cors from "cors";
 import dotenv from "dotenv";
-import models, { connectDB } from "./models/index.js";
+import { connectDB } from "./models/index.js";
+import { errorHandler } from "./util/errorResponse.js";
 
 import cookieParser from "cookie-parser";
-import jsonwebtoken from "jsonwebtoken";
-import bcryptjs from "bcryptjs";
 
 import router from "./routes/autRoutes.js";
 import gameRouter from "./routes/game.js";
 import joinGameRouter from "./routes/joinGame.js";
-import { errorHandler } from "./util/errorResponse.js";
-const { verify } = jsonwebtoken;
-const { hash, compare } = bcryptjs;
+
+/* Need to figure out a way to seperate out the functions that would exist in a controller*/
+//import Game from "./models/Game.js";
+
+import { joinGame } from "./controllers/joinGame.js";
+//import { teacherGame } from "./controllers/teacherGame.js";
+
 const { json, urlencoded } = express;
-//const { server } = websocket;
-//const { server } = socketio;
 
 dotenv.config();
 
@@ -37,13 +37,6 @@ app.use(
     credentials: true,
   })
 );
-/*app.get(
-  "/api",
-  (req, res, next) => {
-    console.log(req.body, "working");
-  },
-  router
-);*/
 
 app.use("/api", router);
 app.use("/api/game/", gameRouter);
@@ -60,23 +53,15 @@ connectDB().then(async () => {
   );
   io.on("connection", (socket) => {
     console.log("new client connected");
-
-    socket.on("studentServer", (data) => {
-      console.log("message", data);
-      socket.emit("studentClient", { hello: "from the server" });
-      //socket.broadcast.emit("outgoing data", { hello: "from the server" });
+    //let studentCode = null;
+    socket.on("studentServer", async (data) => {
+      let studentGame = await joinGame(data);
+      //let teacherUpdate = await teacherGame(data);
+      console.log(studentGame);
+      socket.emit("studentClient", studentGame);
+      socket.emit("teacherClient");
     });
 
     socket.on("disconnect", () => console.log("client disconnected"));
   });
-  /*const wsServer = new server({ httpServer: serverWebSocket });
-    wsServer.on("request", function (request) {
-    console.log("got a handshake from " + request.origin);
-    const connection = request.accept(null, request.origin);
-    connection.on("message", function (message) {
-      const json = { hello: "world" };
-      //sendMessage(JSON.stringify(json));
-      console.log("message", message);
-    });
-  });*/
 });

@@ -1,9 +1,6 @@
 import Game from "../models/Game.js";
 import User from "../models/User.js";
 import Team from "../models/Team.js";
-import Player from "../models/Player.js";
-//import initialData from "../../test/dummyData.js";
-//import initialData from "../data/initial-data.js";
 
 const currentGame = async (req, res, next) => {
   //let initialData;
