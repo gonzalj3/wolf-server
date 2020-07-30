@@ -1,5 +1,6 @@
 import express from "express";
 import websocket from "websocket";
+import socketio from "socket.io";
 import http from "http";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -16,13 +17,15 @@ import { errorHandler } from "./util/errorResponse.js";
 const { verify } = jsonwebtoken;
 const { hash, compare } = bcryptjs;
 const { json, urlencoded } = express;
-const { server } = websocket;
+//const { server } = websocket;
+//const { server } = socketio;
 
 dotenv.config();
 
 /*Create Web Socket
  */
 const serverWebSocket = http.createServer(express);
+const io = socketio(serverWebSocket);
 
 const app = express();
 app.use(cookieParser());
@@ -55,9 +58,19 @@ connectDB().then(async () => {
   serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
   );
-  const wsServer = new server({ httpServer: serverWebSocket });
+  io.on("connection", (socket) => {
+    console.log("new client connected");
 
-  wsServer.on("request", function (request) {
+    socket.on("studentServer", (data) => {
+      console.log("message", data);
+      socket.emit("studentClient", { hello: "from the server" });
+      //socket.broadcast.emit("outgoing data", { hello: "from the server" });
+    });
+
+    socket.on("disconnect", () => console.log("client disconnected"));
+  });
+  /*const wsServer = new server({ httpServer: serverWebSocket });
+    wsServer.on("request", function (request) {
     console.log("got a handshake from " + request.origin);
     const connection = request.accept(null, request.origin);
     connection.on("message", function (message) {
@@ -65,5 +78,5 @@ connectDB().then(async () => {
       //sendMessage(JSON.stringify(json));
       console.log("message", message);
     });
-  });
+  });*/
 });
