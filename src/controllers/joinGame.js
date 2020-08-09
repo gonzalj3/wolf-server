@@ -1,61 +1,42 @@
 import Game from "../models/Game.js";
-//import User from "../models/User.js";
-import Team from "../models/Team.js";
+import GetGameData from "./helper/getGameData.js";
+import { ErrorResponse, errorFormater } from "../util/errorResponse.js";
 
-const joinGame = async (data) => {
-  console.log("message", data);
-  let code = data.gameCode;
+const joinGame = async (req, res, next) => {
+  if (req.body.gameCode) {
+    let gameFound = await Game.findOne({
+      gameCode: req.body.gameCode,
+    });
+    //console.log("gameFound", gameFound);
+    if (gameFound != null) {
+      for (let index = 0; index < gameFound.roster.length; index++) {
+        if (gameFound.roster[index].name === req.body.nickName) {
+          //console.log("A player with that name already exists in the game.");
+          const error = new ErrorResponse(
+            "Someone already has that name in the game.",
+            500
+          );
+          next(error);
+          //return null;
+        }
+      }
+    } else {
+      const error = new ErrorResponse(
+        "We could not find a game for this code",
+        500
+      );
+      next(error);
+    }
 
-  let gameFound = null;
-
-  gameFound = await Game.findOne({
-    gameCode: code,
-  });
-
-  console.log("gamefound", gameFound);
-
-  let returnData = {
-    droppable: {},
-    TeamOrder: [],
-    gameCode: gameFound.gameCode,
-  };
-  for (const teamID of gameFound.teams) {
-    let name = await Team.findById(teamID);
-    returnData.droppable = {
-      [name.name]: {
-        id: name._id,
-        name: name.name,
-        score: name.score,
-        color: name.color,
-        students: name.students,
-      },
-    };
-    returnData.TeamOrder.push(name.name);
+    let returnData = await GetGameData(req.body.gameCode);
+    res.status(200).json(returnData);
+  } else {
+    const error = new ErrorResponse(
+      "Please provide a game code to join a Game",
+      500
+    );
+    next(error);
   }
-  returnData.students = {};
-  gameFound.roster.forEach((element) => {
-    console.log(returnData.students, "insideforeach", element._id);
-    returnData.students[element.id] = {
-      id: element.id,
-      name: element.name,
-    };
-  });
-  returnData.droppable["roster"] = {
-    id: "roster",
-  };
-
-  returnData.droppable.roster.students = [];
-  gameFound.roster.forEach((element) => {
-    returnData.droppable.roster.students.push(element.id);
-  });
-  console.log(
-    "droppable.roster.students",
-    returnData.droppable.roster.students
-  );
-  console.log("returnData", returnData);
-
-  console.log("sending data", returnData, "just sent");
-  return returnData;
 };
 
 export { joinGame };

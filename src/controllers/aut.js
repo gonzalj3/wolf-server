@@ -39,7 +39,7 @@ const registerController = async (req, res, next) => {
           );
           return next(error);
         } else if (userExistance) {
-          existance = userExistance;
+          //existance = userExistance;
           const error = new ErrorResponse("User Already Exists.", 403);
           return next(error);
         } else {
@@ -76,6 +76,7 @@ const registerController = async (req, res, next) => {
         teams: [blue],
         queries: [],
       });
+      await currentGame.save();
       console.log("currentgame", currentGame, "currentcode", currentCode);
       const user = new User({
         email,
@@ -154,42 +155,4 @@ const logInController = async (req, res, next) => {
   }
 };
 
-const joinGameController = async (req, res, next) => {
-  /*const err = validationResult(req).formatWith(errorFormater);
-  if (!err.isEmpty()) {
-    const error = new ErrorResponse(err.array(), 401);
-    return next(error);
-  }*/
-
-  const { gameCode } = req.body;
-  console.log("got game code", gameCode);
-  /*try {
-    const user = await User.findOne({
-      email,
-    });
-    if (!user) {
-      const error = new ErrorResponse("User does not exist.", 401);
-      return next(error);
-    }
-    user.comparePassword(password, function (err, isMatch) {
-      if (err) {
-        const error = new ErrorResponse("Unable to compare password.", 500);
-        return next(error);
-      } else if (isMatch) {
-        let token = accessToken(user.id);
-        user.password = undefined;
-        res.json({
-          user,
-          token,
-        });
-      } else {
-        const error = new ErrorResponse("Incorrect password.", 403);
-        return next(error);
-      }
-    });
-  } catch (err) {
-    return next(err);
-  }*/
-};
-
-export { logInController, registerController, joinGameController };
+export { logInController, registerController };

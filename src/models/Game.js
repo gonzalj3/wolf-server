@@ -11,6 +11,9 @@ const Game = new mongoose.Schema({
     minlength: [4, "game code can not be less than 4 characters"],
     index: { unique: true },
   },
+  teacherSocket: {
+    type: String,
+  },
   roster: [
     {
       id: String,

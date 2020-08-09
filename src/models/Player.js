@@ -12,6 +12,7 @@ const Player = new mongoose.Schema({
     {
       type: mongoose.Schema.ObjectId,
       ref: "Query",
+      default: [],
     },
   ],
   createAt: {

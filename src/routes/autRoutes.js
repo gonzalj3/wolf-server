@@ -1,10 +1,6 @@
 import express from "express";
 let router = express.Router();
-import {
-  registerController,
-  logInController,
-  joinGameController,
-} from "../controllers/aut.js";
+import { registerController, logInController } from "../controllers/aut.js";
 import expressValidator from "express-validator";
 
 const { check } = expressValidator;
@@ -33,7 +29,5 @@ router.post(
   ],
   logInController
 );
-
-//router.post("/joinGame", joinGameController);
 
 export default router;
