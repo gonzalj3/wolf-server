@@ -18,6 +18,7 @@ const Game = new mongoose.Schema({
     {
       id: String,
       name: String,
+      team: String,
     },
   ],
   teams: [
