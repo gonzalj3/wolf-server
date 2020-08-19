@@ -6,7 +6,8 @@ import mongoose from "mongoose";
 const Team = new mongoose.Schema({
   students: [
     {
-      type: String,
+      id: String,
+      name: String,
     },
   ],
   color: {
