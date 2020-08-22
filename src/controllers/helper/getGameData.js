@@ -19,38 +19,27 @@ const GetGameData = async (gameCode) => {
 
   for (const teamID of gameFound.teams) {
     let team = await Team.findById(teamID);
-    console.log("students array: ", team.students);
-    returnData.droppable = {
-      [teamID]: {
-        id: teamID,
-        name: team.name,
-        score: team.score,
-        color: team.color,
-        students: team.students,
-      },
-    };
-    returnData.TeamOrder.push(teamID);
+    console.log("team ", team.name, team);
+    (returnData.droppable[teamID] = {
+      id: teamID,
+      name: team.name,
+      score: team.score,
+      color: team.color,
+      students: team.students,
+    }),
+      returnData.TeamOrder.push(teamID);
   }
   returnData.students = {};
   gameFound.roster.forEach((element) => {
-    console.log(
-      "making roster with: ",
-      element._id,
-      element.name,
-      element.team
-    );
-    //ensure that the player is not part of a team.
-    //if (!element.team) {
     returnData.students[element.id] = {
       id: element.id,
       name: element.name,
-      //};
     };
   });
   returnData.droppable["roster"] = {
     id: "roster",
   };
-
+  //Begin the process to populate  the students array inside the droppable roster object.
   returnData.droppable.roster.students = [];
   gameFound.roster.forEach((element) => {
     if (!element.team) {

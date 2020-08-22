@@ -7,7 +7,6 @@ const Player = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "is required"],
-    index: { unique: true },
   },
   team: {
     type: String,

@@ -17,6 +17,7 @@ const setUpSockets = () => {
   let gameSocket = io.of("/game");
   let teacherID = null;
   gameSocket.on("connection", (socket) => {
+    //Teachers joins a room
     socket.on("registerSocket", async (gameData) => {
       console.log("gameData is : ", gameData);
       console.log("teacher Socket ID", socket.id);
@@ -28,9 +29,13 @@ const setUpSockets = () => {
         );
         console.log(`socket ${document.teacherSocket} `);
       }
+      socket.join(gameData.gameCode);
     });
+
+    //Student joins a game here.
     socket.on("joinGameRoom", async (data) => {
       console.log("student joining game socket id", socket.id);
+      socket.join(data.room);
 
       //console.log(`student data ${data}`);
       console.log("!!!!!!!!!!!student name: ", data.name);
@@ -167,6 +172,91 @@ const setUpSockets = () => {
 
         console.log("the game we ended", updatedGame);
       }
+    });
+    socket.on("newTeam", async (data) => {
+      if (data.team == "yellow") {
+        const yellow = await Team.create({
+          students: [],
+          color: "yellow",
+          name: "yellow",
+          score: 0,
+        });
+        //yellow.save();
+        await Game.findOneAndUpdate(
+          { gameCode: data.room },
+          {
+            $addToSet: {
+              teams: [yellow],
+            },
+          }
+        );
+      } else if (data.team == "red") {
+        const red = await Team.create({
+          students: [],
+          color: "red",
+          name: "red",
+          score: 0,
+        });
+        await Game.findOneAndUpdate(
+          { gameCode: data.room },
+          {
+            $addToSet: {
+              teams: [red],
+            },
+          }
+        );
+      } else if (data.team == "green") {
+        const blue = await Team.create({
+          students: [],
+          color: "green",
+          name: "green",
+          score: 2,
+        });
+        await Game.findOneAndUpdate(
+          { gameCode: data.room },
+          {
+            $addToSet: {
+              teams: [blue],
+            },
+          }
+        );
+      } else if (data.team == "purple") {
+        const purple = await Team.create({
+          students: [],
+          color: "purple",
+          name: "purple",
+          score: 2,
+        });
+        await Game.findOneAndUpdate(
+          { gameCode: data.room },
+          {
+            $addToSet: {
+              teams: [purple],
+            },
+          }
+        );
+      } else if (data.team == "orange") {
+        const orange = await Team.create({
+          students: [],
+          color: "orange",
+          name: "orange",
+          score: 2,
+        });
+        await Game.findOneAndUpdate(
+          { gameCode: data.room },
+          {
+            $addToSet: {
+              teams: [orange],
+            },
+          }
+        );
+      }
+      //let returnData = await GetGameData(data.room);
+
+      //socket.emit("newTeamUpdate", returnData);
+      let returnData = await GetGameData(data.room);
+
+      gameSocket.in(data.room).emit("newTeamUpdate", returnData);
     });
   });
 };
