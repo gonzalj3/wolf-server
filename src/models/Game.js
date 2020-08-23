@@ -29,8 +29,12 @@ const Game = new mongoose.Schema({
   ],
   queries: [
     {
+      /*type: String,
+      question: String,
+      answer: String,*/
       type: mongoose.Schema.ObjectId,
       ref: "Query",
+      //default: [],
     },
   ],
   createAt: {

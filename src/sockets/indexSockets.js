@@ -4,6 +4,7 @@ import socketio from "socket.io";
 import Game from "../models/Game.js";
 import Team from "../models/Team.js";
 import Player from "../models/Player.js";
+import Query from "../models/Query.js";
 import GetGameData from "../controllers/helper/getGameData.js";
 
 const setUpSockets = () => {
@@ -206,17 +207,17 @@ const setUpSockets = () => {
           }
         );
       } else if (data.team == "green") {
-        const blue = await Team.create({
+        const green = await Team.create({
           students: [],
           color: "green",
           name: "green",
-          score: 2,
+          score: 0,
         });
         await Game.findOneAndUpdate(
           { gameCode: data.room },
           {
             $addToSet: {
-              teams: [blue],
+              teams: [green],
             },
           }
         );
@@ -225,7 +226,7 @@ const setUpSockets = () => {
           students: [],
           color: "purple",
           name: "purple",
-          score: 2,
+          score: 0,
         });
         await Game.findOneAndUpdate(
           { gameCode: data.room },
@@ -240,7 +241,7 @@ const setUpSockets = () => {
           students: [],
           color: "orange",
           name: "orange",
-          score: 2,
+          score: 0,
         });
         await Game.findOneAndUpdate(
           { gameCode: data.room },
@@ -251,12 +252,29 @@ const setUpSockets = () => {
           }
         );
       }
-      //let returnData = await GetGameData(data.room);
 
-      //socket.emit("newTeamUpdate", returnData);
       let returnData = await GetGameData(data.room);
-
       gameSocket.in(data.room).emit("newTeamUpdate", returnData);
+    });
+    socket.on("newQuestion", async (data) => {
+      console.log(data);
+      switch (data.type) {
+        case "TF":
+          const tfQuestion = await Query.create({
+            type: "TF",
+          });
+
+          let game = await Game.findOneAndUpdate(
+            { gameCode: data.gameCode },
+            {
+              $addToSet: {
+                queries: [tfQuestion],
+              },
+            },
+            { new: True }
+          );
+        //console.log("we have TF");
+      }
     });
   });
 };

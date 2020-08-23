@@ -15,9 +15,10 @@ const Player = new mongoose.Schema({
     {
       type: mongoose.Schema.ObjectId,
       ref: "Query",
-      default: [],
+      //default: [],
     },
   ],
+  responses: [String],
   createAt: {
     type: Date,
     default: Date.now(),
