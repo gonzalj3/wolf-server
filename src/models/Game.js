@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import Player from "../models/Player.js";
+import Query from "../models/Query.js";
 
 /* @desc: The Game schema. Contains arrays of other schemas.
  */
@@ -14,13 +16,7 @@ const Game = new mongoose.Schema({
   teacherSocket: {
     type: String,
   },
-  roster: [
-    {
-      id: String,
-      name: String,
-      team: String,
-    },
-  ],
+  roster: [Player.schema],
   teams: [
     {
       type: mongoose.Schema.ObjectId,
@@ -28,14 +24,16 @@ const Game = new mongoose.Schema({
     },
   ],
   queries: [
-    {
-      /*type: String,
+    Query.schema,
+
+    /*{
+      type: String,
       question: String,
-      answer: String,*/
+      answer: String,
       type: mongoose.Schema.ObjectId,
       ref: "Query",
-      //default: [],
-    },
+    default: [],
+    },*/
   ],
   createAt: {
     type: Date,

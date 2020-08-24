@@ -46,6 +46,14 @@ const GetGameData = async (gameCode) => {
       returnData.droppable.roster.students.push(element.id);
     }
   });
+  if (gameFound.queries.length > 0) {
+    returnData.question = {
+      type: gameFound.queries[gameFound.queries.length - 1].type,
+    };
+  } else {
+    returnData.question = null;
+  }
+
   console.log("returnDAta: ", returnData);
   return returnData;
 };

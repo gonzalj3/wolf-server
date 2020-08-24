@@ -64,7 +64,7 @@ const setUpSockets = () => {
         { gameCode: data.room },
         {
           $addToSet: {
-            roster: [{ id: newUser._id, name: newUser.name }],
+            roster: [newUser],
           },
         }
       );
@@ -271,8 +271,17 @@ const setUpSockets = () => {
                 queries: [tfQuestion],
               },
             },
-            { new: True }
+            { new: true }
           );
+
+          game.roster.forEach((item, index) => {
+            item.queries.push(tfQuestion);
+            console.log("the queries of a student", item.queries);
+
+            //item.save();
+          });
+          await game.save();
+          gameSocket.in(data.room).emit("newQuestionUpdate", tfQuestion);
         //console.log("we have TF");
       }
     });

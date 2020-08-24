@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Query from "../models/Query.js";
 
 /* @desc: The Player schema.
  */
@@ -12,11 +13,12 @@ const Player = new mongoose.Schema({
     type: String,
   },
   queries: [
-    {
+    Query.schema,
+    /*{
       type: mongoose.Schema.ObjectId,
       ref: "Query",
-      //default: [],
-    },
+      default: [],
+    },*/
   ],
   responses: [String],
   createAt: {
