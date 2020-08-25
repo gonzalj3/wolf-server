@@ -175,7 +175,11 @@ const setUpSockets = () => {
       }
     });
     socket.on("newTeam", async (data) => {
-      if (data.team == "yellow") {
+      let game = await Game.findOne({
+        gameCode: data.room,
+      });
+
+      if (game.teams.length == 1) {
         const yellow = await Team.create({
           students: [],
           color: "yellow",
@@ -191,7 +195,7 @@ const setUpSockets = () => {
             },
           }
         );
-      } else if (data.team == "red") {
+      } else if (game.teams.length == 2) {
         const red = await Team.create({
           students: [],
           color: "red",
@@ -206,7 +210,7 @@ const setUpSockets = () => {
             },
           }
         );
-      } else if (data.team == "green") {
+      } else if (game.teams.length == 3) {
         const green = await Team.create({
           students: [],
           color: "green",
@@ -221,7 +225,7 @@ const setUpSockets = () => {
             },
           }
         );
-      } else if (data.team == "purple") {
+      } else if (game.teams.length == 4) {
         const purple = await Team.create({
           students: [],
           color: "purple",
@@ -236,7 +240,7 @@ const setUpSockets = () => {
             },
           }
         );
-      } else if (data.team == "orange") {
+      } else if (game.teams.length == 5) {
         const orange = await Team.create({
           students: [],
           color: "orange",
@@ -281,7 +285,8 @@ const setUpSockets = () => {
             //item.save();
           });
           await game.save();
-          gameSocket.in(data.room).emit("newQuestionUpdate", tfQuestion);
+          let returnData = await GetGameData(data.gameCode);
+          gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
         //console.log("we have TF");
       }
     });
