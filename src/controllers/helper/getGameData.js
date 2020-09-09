@@ -19,7 +19,7 @@ const GetGameData = async (gameCode) => {
 
   for (const teamID of gameFound.teams) {
     let team = await Team.findById(teamID);
-    console.log("team ", team.name, team);
+    //console.log("team ", team.name, team);
     (returnData.droppable[teamID] = {
       id: teamID,
       name: team.name,
@@ -54,7 +54,7 @@ const GetGameData = async (gameCode) => {
     returnData.question = null;
   }
 
-  console.log("returnDAta: ", returnData);
+  //console.log("returnDAta: ", returnData);
   return returnData;
 };
 

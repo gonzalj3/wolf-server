@@ -58,6 +58,13 @@ const setUpSockets = () => {
       let newUser = await Player.create({
         name: data.name,
         team: null,
+        queries: [],
+        responses: [],
+      });
+
+      gameFound.queries.forEach((item, index) => {
+        newUser.queries.push(item);
+        newUser.responses.push(null);
       });
       await newUser.save();
       let game = await Game.findOneAndUpdate(
@@ -289,6 +296,56 @@ const setUpSockets = () => {
           gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
         //console.log("we have TF");
       }
+    });
+    socket.on("setAnswer", async (data) => {
+      /* Determine type of question, find game and the last query from queries array. 
+      Update the game with new answer and update this for each student as well. 
+      Websocket to all the students in teh room with new data. 
+      */
+      switch (data.type) {
+        case "TF":
+          let game = await Game.findOne({ gameCode: data.gameCode });
+          console.log("game is: ", game);
+          let lastQuestion = game.queries[game.queries.length - 1];
+          console.log("here is the last question : ", lastQuestion);
+
+          if (lastQuestion) {
+            lastQuestion.answer = data.answer;
+          }
+          await game.save();
+
+          console.log("here is the last question : ", lastQuestion);
+          game.roster.forEach((item, index) => {
+            let lastQuestion = item.queries[item.queries.length - 1];
+            console.log("the queries of a student", item.queries);
+            if (lastQuestion) {
+              lastQuestion.answer = data.answer;
+            }
+            console.log("the queries of a student", item.queries);
+          });
+
+          await game.save();
+          let returnData = await GetGameData(data.gameCode);
+          //Need to change the code below.
+          gameSocket.in(data.gameCode).emit("setAnswerUpdate", returnData);
+      }
+    });
+    socket.on("studentAnswer", async (data) => {
+      console.log("student :", data);
+      let game = await Game.findOne({ gameCode: data.gameCode });
+      console.log("game found: ", game);
+      game.roster.forEach(async (item, index) => {
+        console.log("the data.name and item.name: ", item.name, data.student);
+        if (item.name == data.student) {
+          //we have found the student we want
+          let lastQuestion = item.queries[item.queries.length - 1];
+          if (lastQuestion) {
+            lastQuestion.answer = data.answer;
+            await game.save();
+            console.log("the last question now reads: ", lastQuestion);
+          }
+        }
+      });
     });
   });
 };
