@@ -31,7 +31,7 @@ export default mongoose.model("Player", Player);
  * @param: next
  * @returns: none
  */
-/*User.pre("save", async function (next) {
+/*Teacher.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
   }
@@ -46,7 +46,7 @@ export default mongoose.model("Player", Player);
  * @param: string
  * @returns: object
  */
-/*User.methods.comparePassword = function (enteredPassword, result) {
+/*Teacher.methods.comparePassword = function (enteredPassword, result) {
   bcryptjs.compare(enteredPassword, this.password, function (err, isMatch) {
     if (err) {
       console.log(err);
@@ -57,4 +57,4 @@ export default mongoose.model("Player", Player);
   });
 };
 
-export default mongoose.model("User", User);*/
+export default mongoose.model("Teacher", Teacher);*/

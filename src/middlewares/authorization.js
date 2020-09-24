@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import Teacher from "../models/Teacher.js";
 import jsonwebtoken from "jsonwebtoken";
 const { verify } = jsonwebtoken;
 import { ErrorResponse } from "../util/errorResponse.js";
@@ -13,7 +13,7 @@ const isAuth = async (req, res, next) => {
       const token = req.headers.authorization.split(" ")[1];
       const decoded = verify(token, process.env.ACCESS_TOKEN_SECRET);
 
-      const user = await User.findById(decoded.id);
+      const user = await Teacher.findById(decoded.id);
       user.password = undefined;
 
       req.user = user;

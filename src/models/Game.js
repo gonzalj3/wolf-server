@@ -16,6 +16,7 @@ const Game = new mongoose.Schema({
   teacherSocket: {
     type: String,
   },
+  //The declaration for roster originally was roster:[Player.schema]
   roster: [Player.schema],
   teams: [
     {
@@ -45,7 +46,7 @@ const Game = new mongoose.Schema({
  * @param: next
  * @returns: none
  */
-/*User.pre("save", async function (next) {
+/*Teacher.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
   }
@@ -60,7 +61,7 @@ const Game = new mongoose.Schema({
  * @param: string
  * @returns: object
  */
-/*User.methods.comparePassword = function (enteredPassword, result) {
+/*Teacher.methods.comparePassword = function (enteredPassword, result) {
   bcryptjs.compare(enteredPassword, this.password, function (err, isMatch) {
     if (err) {
       console.log(err);

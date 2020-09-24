@@ -1,10 +1,10 @@
 import GetGameData from "./helper/getGameData.js";
-import User from "../models/User.js";
+import Teacher from "../models/Teacher.js";
 import Game from "../models/Game.js";
 import { ErrorResponse } from "../util/errorResponse.js";
 
 const currentGame = async (req, res, next) => {
-  let exist = await User.findOne({
+  let exist = await Teacher.findOne({
     email: req.user.email,
   });
   let currentGame = exist.currentGame;

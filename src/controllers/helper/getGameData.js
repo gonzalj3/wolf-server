@@ -1,5 +1,5 @@
 import Game from "../../models/Game.js";
-import User from "../../models/User.js";
+import Teacher from "../../models/Teacher.js";
 import Team from "../../models/Team.js";
 import { ErrorResponse } from "../../util/errorResponse.js";
 
@@ -46,14 +46,38 @@ const GetGameData = async (gameCode) => {
       returnData.droppable.roster.students.push(element.id);
     }
   });
+  //Passing the current question.
   if (gameFound.queries.length > 0) {
     returnData.question = {
       type: gameFound.queries[gameFound.queries.length - 1].type,
+      index: gameFound.queries.length - 1,
+      answer: gameFound.queries[gameFound.queries.length - 1].answer,
     };
   } else {
     returnData.question = null;
   }
-
+  //Returning all current game query responses, by first checking that we have a current question in progress.
+  console.log("queries : ", gameFound.queries);
+  if (
+    gameFound.queries.length > 0 &&
+    !gameFound.queries[gameFound.queries.length - 1].answer
+  ) {
+    returnData.responses = [];
+    gameFound.roster.forEach((item, index) => {
+      //ensure that a response exists for the current query and if so provide it to the teachers front end to print out
+      let teamName = "";
+      if (item.team != null) {
+        teamName = item.team;
+      }
+      if (item.responses[gameFound.queries.length - 1]) {
+        returnData.responses.push({
+          name: item.name,
+          team: teamName,
+          response: item.responses[gameFound.queries.length - 1],
+        });
+      }
+    });
+  }
   //console.log("returnDAta: ", returnData);
   return returnData;
 };

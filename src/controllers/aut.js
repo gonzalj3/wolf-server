@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import Teacher from "../models/Teacher.js";
 import Game from "../models/Game.js";
 import Team from "../models/Team.js";
 import { randomGameCode } from "../util/randomGameCode.js";
@@ -27,7 +27,7 @@ const registerController = async (req, res, next) => {
   const { email, firstName, lastName, schoolName, password } = req.body;
   try {
     //let existance = false;
-    let exist = await User.findOne(
+    let exist = await Teacher.findOne(
       {
         email: email,
       },
@@ -40,7 +40,7 @@ const registerController = async (req, res, next) => {
           return next(error);
         } else if (userExistance) {
           //existance = userExistance;
-          const error = new ErrorResponse("User Already Exists.", 403);
+          const error = new ErrorResponse("Teacher Already Exists.", 403);
           return next(error);
         } else {
           console.log("finish looking for user");
@@ -68,7 +68,7 @@ const registerController = async (req, res, next) => {
         students: [],
         color: "blue",
         name: "blue",
-        score: 2,
+        score: 0,
       });
       const currentGame = await Game.create({
         gameCode: currentCode,
@@ -78,7 +78,7 @@ const registerController = async (req, res, next) => {
       });
       await currentGame.save();
       console.log("currentgame", currentGame, "currentcode", currentCode);
-      const user = new User({
+      const user = new Teacher({
         email,
         firstName,
         lastName,
@@ -127,11 +127,11 @@ const logInController = async (req, res, next) => {
 
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({
+    const user = await Teacher.findOne({
       email,
     });
     if (!user) {
-      const error = new ErrorResponse("User does not exist.", 401);
+      const error = new ErrorResponse("Teacher does not exist.", 401);
       return next(error);
     }
     user.comparePassword(password, function (err, isMatch) {

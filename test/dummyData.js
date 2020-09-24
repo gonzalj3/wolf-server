@@ -26,7 +26,7 @@ connectDB().then(async () => {
   });
   //console.log(game);
   games.push(game);
-  //We will take the last added game in User's games array.
+  //We will take the last added game in Teacher's games array.
   const gameFound = await Game.findById(games[games.length - 1]);
   let returnData = {
     droppable: {},
