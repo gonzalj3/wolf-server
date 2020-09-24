@@ -94,18 +94,14 @@ const setUpSockets = () => {
       });
       let gameRoster = game.roster;
       if (data.to == "roster") {
-        //We first find/change the player's team property.
-        let studentUpdated = await Player.findOneAndUpdate(
-          {
-            _id: data.student,
-          },
-          {
-            team: null,
-          },
-          {
-            new: true,
+        for (let student of game.roster) {
+          if (student.id == data.student) {
+            student.team = "team";
           }
-        );
+        }
+        game.markModified("roster");
+
+        await game.save();
         //We then find the student in the game's rosters array of object and update that student objet property team.
         for (let student of game.roster) {
           if (student.id == data.student) {
@@ -117,7 +113,7 @@ const setUpSockets = () => {
             let updatedGame = await game.save();
             //We then find the team and update that roster as well.
             await Team.findOneAndUpdate(
-              { _id: team },
+              { _id: data.from },
               {
                 $pull: { students: { id: data.student } },
               }
@@ -126,69 +122,60 @@ const setUpSockets = () => {
         }
       } else {
         let teamName = null;
-        for (const element of gameRoster) {
-          //console.log("element name is :", element.name);
-          if (element.id == data.student) {
-            console.log("the team we have is", data.to, data.from);
-            teamName = await Team.findOneAndUpdate(
-              { _id: data.to },
-              {
-                $addToSet: {
-                  students: [{ id: data.student, name: element.name }],
-                },
-              }
-            );
-            await Team.findOneAndUpdate(
-              { _id: data.from },
-              {
-                $pull: {
-                  students: { id: data.student },
-                },
-              }
-            );
-          }
-        }
-        console.log("the game we started with: ", game);
-        console.log(`studentID : ${data.student}`);
-        //console.log("gameRoster");
 
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!", data.to);
-        /*await game.updateOne(
-          { "roster.id": data.student },
-          {
-            $set: { "roster.$.team": data.team },
-          }
-        );*/
+        const status = await Promise.all(
+          gameRoster.map((student) => {
+            if (student.id == data.student) {
+              let team = Team.findOneAndUpdate(
+                { _id: data.to },
+                {
+                  $addToSet: {
+                    students: [{ id: data.student, name: student.name }],
+                  },
+                }
+              );
+              teamName = team.name;
+              return team;
+            }
+          })
+        );
+
+        const status2 = await Promise.all(
+          gameRoster.map((student) => {
+            if (student.id == data.student) {
+              if (data.from !== "roster") {
+                let oldTeam = data.from;
+
+                let team = Team.findOneAndUpdate(
+                  { _id: oldTeam },
+                  {
+                    $pull: {
+                      students: { id: data.student },
+                    },
+                  }
+                );
+
+                return team;
+              }
+            }
+          })
+        );
+        console.log(
+          "the status for both promises : ",
+          status,
+          status2,
+          teamName
+        );
+        //
+        //So in order to get the student to not appear on the unassigned roster bar we will give that student element in the roster array a team name of "team"
         for (let student of game.roster) {
           if (student.id == data.student) {
-            console.log(
-              "******** we have found a student and are updting team *********"
-            );
-            student.team = teamName.name;
+            student.team = "team";
           }
         }
         game.markModified("roster");
 
         let updatedGame = await game.save();
-
-        //Find the user and assign their property team to a team.
-        /*await Player.findOneAndUpdate(
-          {
-            _id: data.student,
-          },
-          {
-            team: data.to,
-          }
-        );*/
-
-        /*await Game.findOneAndUpdate(
-          { gameCode: data.gameCode },
-          {
-            $pull: { roster: { id: data.student } },
-          }
-        );*/
-        //let game222 = await Game.findOne({ gameCode: data.gameCode });
-
         console.log("the game we ended", updatedGame);
       }
     });
