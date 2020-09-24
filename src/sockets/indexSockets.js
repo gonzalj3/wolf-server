@@ -50,7 +50,7 @@ const setUpSockets = () => {
             console.log("A player with that name already exists in the game.");
             let returnData = await GetGameData(data.room);
 
-            socket.emit("joinGameRoom", returnData);
+            socket.emit("gameData", returnData);
             return;
           }
         }
@@ -58,20 +58,27 @@ const setUpSockets = () => {
       let newUser = await Player.create({
         name: data.name,
         team: null,
+        queries: [],
+        responses: [],
+      });
+      await newUser.save();
+      gameFound.queries.forEach((item, index) => {
+        newUser.queries.push(item);
+        newUser.responses.push(null);
       });
       await newUser.save();
       let game = await Game.findOneAndUpdate(
         { gameCode: data.room },
         {
           $addToSet: {
-            roster: [{ id: newUser._id, name: newUser.name }],
+            roster: [newUser],
           },
         }
       );
       await game.save();
       let returnData = await GetGameData(data.room);
       console.log("about to socket over data: ", returnData);
-      socket.emit("joinGameRoom", returnData);
+      socket.emit("gameData", returnData);
 
       console.log(`teacherSocket: ${game.teacherSocket}`);
       socket.to(game.teacherSocket).emit("newStudent", returnData);
@@ -80,13 +87,13 @@ const setUpSockets = () => {
       console.log("got message on gameTime: ", message);
     });
     socket.on("moveStudent", async (data) => {
-      console.log(data);
+      console.log("moving student with data : ", data);
 
       let game = await Game.findOne({
         gameCode: data.gameCode,
       });
       let gameRoster = game.roster;
-      if (data.team == "roster") {
+      if (data.to == "roster") {
         //We first find/change the player's team property.
         let studentUpdated = await Player.findOneAndUpdate(
           {
@@ -118,15 +125,24 @@ const setUpSockets = () => {
           }
         }
       } else {
+        let teamName = null;
         for (const element of gameRoster) {
           //console.log("element name is :", element.name);
           if (element.id == data.student) {
-            console.log("the team we have is", data.team);
-            await Team.findOneAndUpdate(
-              { _id: data.team },
+            console.log("the team we have is", data.to, data.from);
+            teamName = await Team.findOneAndUpdate(
+              { _id: data.to },
               {
                 $addToSet: {
                   students: [{ id: data.student, name: element.name }],
+                },
+              }
+            );
+            await Team.findOneAndUpdate(
+              { _id: data.from },
+              {
+                $pull: {
+                  students: { id: data.student },
                 },
               }
             );
@@ -136,7 +152,7 @@ const setUpSockets = () => {
         console.log(`studentID : ${data.student}`);
         //console.log("gameRoster");
 
-        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!", data.team);
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!", data.to);
         /*await game.updateOne(
           { "roster.id": data.student },
           {
@@ -148,20 +164,22 @@ const setUpSockets = () => {
             console.log(
               "******** we have found a student and are updting team *********"
             );
-            student.team = data.team;
+            student.team = teamName.name;
           }
         }
+        game.markModified("roster");
+
         let updatedGame = await game.save();
 
         //Find the user and assign their property team to a team.
-        await Player.findOneAndUpdate(
+        /*await Player.findOneAndUpdate(
           {
             _id: data.student,
           },
           {
-            team: data.team,
+            team: data.to,
           }
-        );
+        );*/
 
         /*await Game.findOneAndUpdate(
           { gameCode: data.gameCode },
@@ -175,7 +193,11 @@ const setUpSockets = () => {
       }
     });
     socket.on("newTeam", async (data) => {
-      if (data.team == "yellow") {
+      let game = await Game.findOne({
+        gameCode: data.room,
+      });
+
+      if (game.teams.length == 1) {
         const yellow = await Team.create({
           students: [],
           color: "yellow",
@@ -191,7 +213,7 @@ const setUpSockets = () => {
             },
           }
         );
-      } else if (data.team == "red") {
+      } else if (game.teams.length == 2) {
         const red = await Team.create({
           students: [],
           color: "red",
@@ -206,7 +228,7 @@ const setUpSockets = () => {
             },
           }
         );
-      } else if (data.team == "green") {
+      } else if (game.teams.length == 3) {
         const green = await Team.create({
           students: [],
           color: "green",
@@ -221,7 +243,7 @@ const setUpSockets = () => {
             },
           }
         );
-      } else if (data.team == "purple") {
+      } /*else if (game.teams.length == 4) {
         const purple = await Team.create({
           students: [],
           color: "purple",
@@ -236,7 +258,7 @@ const setUpSockets = () => {
             },
           }
         );
-      } else if (data.team == "orange") {
+      } else if (game.teams.length == 5) {
         const orange = await Team.create({
           students: [],
           color: "orange",
@@ -251,7 +273,7 @@ const setUpSockets = () => {
             },
           }
         );
-      }
+      }*/
 
       let returnData = await GetGameData(data.room);
       gameSocket.in(data.room).emit("newTeamUpdate", returnData);
@@ -271,10 +293,146 @@ const setUpSockets = () => {
                 queries: [tfQuestion],
               },
             },
-            { new: True }
+            { new: true }
           );
+
+          /*game.roster.forEach((item, index) => {
+            item.queries.push(tfQuestion);
+            console.log("the queries of a student", item.queries);
+
+            //item.save();
+          });*/
+          await game.save();
+          let returnData = await GetGameData(data.gameCode);
+          gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
         //console.log("we have TF");
       }
+    });
+    socket.on("setAnswer", async (data) => {
+      /* Determine type of question, find game and the last query from queries array. 
+      Update the game with new answer and update this for each student as well. 
+      Websocket to all the students in teh room with new data. 
+      */
+      switch (data.type) {
+        case "TF":
+          let game = await Game.findOne({ gameCode: data.gameCode });
+          console.log("game is: ", game);
+          let lastQuestion = game.queries[game.queries.length - 1];
+          console.log("here is the last question : ", lastQuestion);
+
+          if (lastQuestion) {
+            lastQuestion.answer = data.answer;
+          }
+          await game.save();
+
+          console.log("here is the last question : ", lastQuestion);
+          //May just remove teh queries for each student since we already store data.
+          await game.save();
+          let returnData = await GetGameData(data.gameCode);
+          //Need to change the code below.
+          gameSocket.in(data.gameCode).emit("setAnswerUpdate", returnData);
+      }
+    });
+    socket.on("studentAnswer", async (data) => {
+      console.log("student :", data);
+      let game = await Game.findOne({ gameCode: data.gameCode });
+      console.log("game found: ", game);
+      console.log("");
+      var studentFound = game.roster.filter((student) => {
+        //console.log("")
+        return student.name === data.student;
+      });
+      game.roster;
+      console.log("the student found: ", studentFound);
+      let lastQuestion = game.queries[game.queries.length - 1];
+
+      //we need to ensure that we do not have an answer provided by the teacher we do this by looking at the answer property.
+      if (lastQuestion && !lastQuestion.answer) {
+        console.log("we have no teacher saved answer");
+        if (!studentFound[0].responses) {
+          console.log("savign student response1");
+
+          studentFound[0].responses = [];
+          console.log("game.queries.length - 1 :", game.queries.length - 1);
+          studentFound[0].responses[game.queries.length - 1] = data.answer;
+          console.log(studentFound, data.answer);
+          await game.save((err, obj) => {
+            if (err) {
+              console.log("error: ", err);
+            }
+            console.log("gamesave ", obj.responses);
+          });
+        } else {
+          console.log("savign student response");
+          studentFound[0].responses[game.queries.length - 1] = data.answer;
+
+          let savedStudent = await studentFound[0].save();
+          savedStudent.markModified("responses");
+          let savedGame = await game.save();
+          console.log("saved game: ", savedGame.roster);
+          console.log("saved student: ", savedStudent);
+        }
+      }
+      /*for (let index = 0; index <= game.roster.length - 1; index++) {
+        let item = game.roster[index];
+        if (item.name == data.student) {
+          //we have found the student we want
+          //let lastQuestion = item.queries[item.queries.length - 1];
+          let lastQuestion = game.queries[game.queries.length - 1];
+
+          //we need to ensure that we do not have an answer provided by the teacher we do this by looking at the answer property.
+          if (lastQuestion && !lastQuestion.answer) {
+            //lastQuestion.answer = data.answer;
+            console.log(
+              "response before change",
+              item.responses[game.queries.length - 1],
+              item.responses,
+              game.queries.length
+            );
+
+            if (!item.responses) {
+              item.responses = [];
+              item.responses[game.queries.length - 1] = data.answer;
+              await game.save();
+            } else {
+              item.responses[game.queries.length - 1] = data.answer;
+              await game.save();
+            }
+          }
+        }
+      }*/
+
+      let populateReturnData = new Promise(async (resolve, reject) => {
+        let returnData = [];
+
+        game.roster.forEach((item, index) => {
+          //ensure that a response exists for the current query and if so provide it to the teachers front end to print out
+          if (item.responses[game.queries.length - 1]) {
+            /*returnData.name.push(item.name);
+            returnData.team.push(item.team);
+            returnData.response.push(item.responses[game.queries.length - 1]);*/
+            let teamName = "";
+            if (item.team != null) {
+              teamName = item.team;
+            }
+            returnData.push({
+              name: item.name,
+              team: teamName,
+              response: item.responses[game.queries.length - 1],
+            });
+          }
+        });
+
+        resolve(returnData);
+      });
+      populateReturnData.then(async (data) => {
+        console.log("data in then :", data);
+
+        socket.to(game.teacherSocket).emit("newStudentAnswer", data);
+        console.log("we have sent returnData ");
+      });
+
+      //we need to communicate to the teacher here that we got new info for a student
     });
   });
 };

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Query from "../models/Query.js";
 
 /* @desc: The Player schema.
  */
@@ -12,11 +13,12 @@ const Player = new mongoose.Schema({
     type: String,
   },
   queries: [
-    {
+    Query.schema,
+    /*{
       type: mongoose.Schema.ObjectId,
       ref: "Query",
-      //default: [],
-    },
+      default: [],
+    },*/
   ],
   responses: [String],
   createAt: {
@@ -29,7 +31,7 @@ export default mongoose.model("Player", Player);
  * @param: next
  * @returns: none
  */
-/*User.pre("save", async function (next) {
+/*Teacher.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
   }
@@ -44,7 +46,7 @@ export default mongoose.model("Player", Player);
  * @param: string
  * @returns: object
  */
-/*User.methods.comparePassword = function (enteredPassword, result) {
+/*Teacher.methods.comparePassword = function (enteredPassword, result) {
   bcryptjs.compare(enteredPassword, this.password, function (err, isMatch) {
     if (err) {
       console.log(err);
@@ -55,4 +57,4 @@ export default mongoose.model("Player", Player);
   });
 };
 
-export default mongoose.model("User", User);*/
+export default mongoose.model("Teacher", Teacher);*/
