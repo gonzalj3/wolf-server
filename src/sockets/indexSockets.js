@@ -121,8 +121,6 @@ const setUpSockets = () => {
           }
         }
       } else {
-        let teamName = null;
-
         const status = await Promise.all(
           gameRoster.map((student) => {
             if (student.id == data.student) {
@@ -134,7 +132,7 @@ const setUpSockets = () => {
                   },
                 }
               );
-              teamName = team.name;
+              //teamName = team.name;
               return team;
             }
           })
@@ -160,17 +158,13 @@ const setUpSockets = () => {
             }
           })
         );
-        console.log(
-          "the status for both promises : ",
-          status,
-          status2,
-          teamName
-        );
-        //
+        console.log("the status for both promises : ", status, status2);
+        let team = status.find((team) => team != undefined);
         //So in order to get the student to not appear on the unassigned roster bar we will give that student element in the roster array a team name of "team"
         for (let student of game.roster) {
           if (student.id == data.student) {
-            student.team = "team";
+            student.team = team.name;
+            console.log("studnet team i now : ", student.team);
           }
         }
         game.markModified("roster");
@@ -272,16 +266,22 @@ const setUpSockets = () => {
           const tfQuestion = await Query.create({
             type: "TF",
           });
-
-          let game = await Game.findOneAndUpdate(
-            { gameCode: data.gameCode },
-            {
-              $addToSet: {
-                queries: [tfQuestion],
+          //need to add logic here so that if the last question in the array
+          //queries from game model has an unanswered portion we simply replace that one instead of adding a new one
+          let game = await Game.findOne({ gameCode: data.gameCode });
+          if (game.queries[game.queries.length - 1].answer == null) {
+            game.queries[game.queries.length - 1].type = "TF";
+          } else {
+            let game = await Game.findOneAndUpdate(
+              { gameCode: data.gameCode },
+              {
+                $addToSet: {
+                  queries: [tfQuestion],
+                },
               },
-            },
-            { new: true }
-          );
+              { new: true }
+            );
+          }
 
           /*game.roster.forEach((item, index) => {
             item.queries.push(tfQuestion);
@@ -420,6 +420,14 @@ const setUpSockets = () => {
       });
 
       //we need to communicate to the teacher here that we got new info for a student
+    });
+    socket.on("cancelQuestion", async (data) => {
+      if (data.gameCode && data.index) {
+        let game = await Game.findOne({ gameCode: data.gameCode });
+        game.queries[data.index].type = null;
+        game.queries[data.index].answer = null;
+        game.save();
+      }
     });
   });
 };
