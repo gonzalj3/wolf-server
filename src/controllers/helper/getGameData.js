@@ -17,17 +17,17 @@ const GetGameData = async (gameCode) => {
     gameCode: gameFound.gameCode,
   };
 
-  for (const teamID of gameFound.teams) {
-    let team = await Team.findById(teamID);
+  for (const team of gameFound.teams) {
+    //let team = await Team.findById(teamID);
     //console.log("team ", team.name, team);
-    (returnData.droppable[teamID] = {
-      id: teamID,
+    (returnData.droppable[team._id] = {
+      id: team._id,
       name: team.name,
       score: team.score,
       color: team.color,
       students: team.students,
     }),
-      returnData.TeamOrder.push(teamID);
+      returnData.TeamOrder.push(team._id);
   }
   returnData.students = {};
   gameFound.roster.forEach((element) => {
