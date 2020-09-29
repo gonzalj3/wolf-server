@@ -161,38 +161,13 @@ const setUpSockets = () => {
         for (let student of game.roster) {
           if (student.id == data.student) {
             student.team = teamTo.name;
-            console.log("studnet team i now : ", student.team);
+            //console.log("studnet team i now : ", student.team);
           }
         }
         game.markModified("roster");
 
         let updatedGame = await game.save();
-        /*let team = Team.findOneAndUpdate(
-                { _id: data.to },
-                {
-                  $addToSet: {
-                    students: [{ id: data.student, name: student.name }],
-                  },
-                }
-              );*/
-        //teamName = team.name;
-        //return team;
-        //   }
-        // })
-        //);
-
-        //const status2 = await Promise.all(
-        //gameRoster.map((student) => {
-        //if (student.id == data.student) {
-
-        //}
-        //})
-        //);
-        //console.log("the status for both promises : ", status, status2);
-        //let team = status.find((team) => team != undefined);
-        //So in order to get the student to not appear on the unassigned roster bar we will give that student element in the roster array a team name of "team"
-
-        console.log("the game we ended", updatedGame);
+        //console.log("the game we ended", updatedGame);
       }
     });
     socket.on("newTeam", async (data) => {
