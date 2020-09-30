@@ -52,6 +52,7 @@ const GetGameData = async (gameCode) => {
       type: gameFound.queries[gameFound.queries.length - 1].type,
       index: gameFound.queries.length - 1,
       answer: gameFound.queries[gameFound.queries.length - 1].answer,
+      scored: gameFound.queries[gameFound.queries.length - 1].scored,
     };
   } else {
     returnData.question = null;

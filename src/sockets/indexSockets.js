@@ -266,8 +266,12 @@ const setUpSockets = () => {
           //need to add logic here so that if the last question in the array
           //queries from game model has an unanswered portion we simply replace that one instead of adding a new one
           let game = await Game.findOne({ gameCode: data.gameCode });
-          if (game.queries[game.queries.length - 1].answer == null) {
+          if (
+            game.queries.length - 1 >= 0 &&
+            game.queries[game.queries.length - 1].answer == null
+          ) {
             game.queries[game.queries.length - 1].type = "TF";
+            await game.save();
           } else {
             let game = await Game.findOneAndUpdate(
               { gameCode: data.gameCode },
@@ -278,6 +282,7 @@ const setUpSockets = () => {
               },
               { new: true }
             );
+            await game.save();
           }
 
           /*game.roster.forEach((item, index) => {
@@ -286,7 +291,7 @@ const setUpSockets = () => {
 
             //item.save();
           });*/
-          await game.save();
+          //await game.save();
           let returnData = await GetGameData(data.gameCode);
           gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
         //console.log("we have TF");
@@ -424,10 +429,12 @@ const setUpSockets = () => {
         game.queries[data.index].type = null;
         game.queries[data.index].answer = null;
         game.save();
+        let returnData = await GetGameData(data.gameCode);
+        gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
       }
     });
     socket.on("pointChangeTeam", async (data) => {
-      console.log("registered point change team");
+      //console.log("registered point change team");
       if (data.team && data.gameCode) {
         let game = await Game.findOne({
           gameCode: data.gameCode,
@@ -436,7 +443,26 @@ const setUpSockets = () => {
         team.score += data.point;
         game.markModified("teams");
         await game.save();
-        console.log("saved points earned, ", team.score);
+        //console.log("saved points earned, ", team.score);
+        let studentUpdate = {
+          team: data.team,
+          score: team.score,
+        };
+        //I am going to try to set up the socket to simply relay point changes to students
+        //I dont necessarily want to always pull all the game data if we dont need to.
+        //Instead what I want to do is simply update the componenets that need to change (on the student end)
+        gameSocket.in(data.gameCode).emit("teamPointUpdate", studentUpdate);
+      }
+    });
+    socket.on("awardPoints", async (data) => {
+      if (data.gameCode && data.index) {
+        //We will find the query and mark it as scored
+        let game = await Game.findOne({ gameCode: data.gameCode });
+        let query = game.queries[data.index];
+        query.scored = true;
+        query.answer = data.answer;
+        game.markModified("queries");
+        await game.save();
       }
     });
   });
