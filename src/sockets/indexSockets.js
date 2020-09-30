@@ -426,12 +426,17 @@ const setUpSockets = () => {
         game.save();
       }
     });
-    socket.on("pointForTeam", async (data) => {
-      if (data.team && data.room) {
+    socket.on("pointChangeTeam", async (data) => {
+      console.log("registered point change team");
+      if (data.team && data.gameCode) {
         let game = await Game.findOne({
-          gameCode: data.room,
+          gameCode: data.gameCode,
         });
-        //game.teams.
+        let team = game.teams.find((team) => team._id == data.team);
+        team.score += data.point;
+        game.markModified("teams");
+        await game.save();
+        console.log("saved points earned, ", team.score);
       }
     });
   });
