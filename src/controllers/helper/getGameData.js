@@ -58,7 +58,7 @@ const GetGameData = async (gameCode) => {
     returnData.question = null;
   }
   //Returning all current game query responses, by first checking that we have a current question in progress.
-  console.log("queries : ", gameFound.queries);
+  //console.log("queries : ", gameFound.queries);
   if (
     gameFound.queries.length > 0 &&
     !gameFound.queries[gameFound.queries.length - 1].answer

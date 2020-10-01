@@ -325,14 +325,14 @@ const setUpSockets = () => {
     socket.on("studentAnswer", async (data) => {
       console.log("student :", data);
       let game = await Game.findOne({ gameCode: data.gameCode });
-      console.log("game found: ", game);
+      //console.log("game found: ", game);
       console.log("");
       var studentFound = game.roster.filter((student) => {
         //console.log("")
         return student.name === data.student;
       });
-      game.roster;
-      console.log("the student found: ", studentFound);
+      //game.roster;
+      //console.log("the student found: ", studentFound);
       let lastQuestion = game.queries[game.queries.length - 1];
 
       //we need to ensure that we do not have an answer provided by the teacher we do this by looking at the answer property.
@@ -362,34 +362,6 @@ const setUpSockets = () => {
           console.log("saved student: ", savedStudent);
         }
       }
-      /*for (let index = 0; index <= game.roster.length - 1; index++) {
-        let item = game.roster[index];
-        if (item.name == data.student) {
-          //we have found the student we want
-          //let lastQuestion = item.queries[item.queries.length - 1];
-          let lastQuestion = game.queries[game.queries.length - 1];
-
-          //we need to ensure that we do not have an answer provided by the teacher we do this by looking at the answer property.
-          if (lastQuestion && !lastQuestion.answer) {
-            //lastQuestion.answer = data.answer;
-            console.log(
-              "response before change",
-              item.responses[game.queries.length - 1],
-              item.responses,
-              game.queries.length
-            );
-
-            if (!item.responses) {
-              item.responses = [];
-              item.responses[game.queries.length - 1] = data.answer;
-              await game.save();
-            } else {
-              item.responses[game.queries.length - 1] = data.answer;
-              await game.save();
-            }
-          }
-        }
-      }*/
 
       let populateReturnData = new Promise(async (resolve, reject) => {
         let returnData = [];
@@ -462,7 +434,41 @@ const setUpSockets = () => {
         query.scored = true;
         query.answer = data.answer;
         game.markModified("queries");
+        //await game.save();
+        console.log(
+          "************************** we have updated the scores ***********************"
+        );
+
+        for (let student of game.roster) {
+          //Ensure the student answered the question
+          if (student.responses[data.index]) {
+            //Ensure the answer is correct
+            if (data.answer == student.responses[data.index]) {
+              //Find the team that matches the student's team
+              let team = game.teams.filter((team) => {
+                console.log("team name, student name", team.name, student.team);
+                return team.name == student.team;
+              });
+              console.log(
+                "the team and team score is : ",
+                team[0],
+                team[0].score
+              );
+
+              team[0].score += 1;
+              game.markModified("teams");
+              console.log(
+                "the team and team score is : ",
+                team[0],
+                team[0].score
+              );
+            }
+          }
+        }
         await game.save();
+        let returnData = await GetGameData(data.gameCode);
+        //Need to change the code below.
+        gameSocket.in(data.gameCode).emit("setAnswerUpdate", returnData);
       }
     });
   });
