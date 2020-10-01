@@ -427,14 +427,16 @@ const setUpSockets = () => {
       }
     });
     socket.on("awardPoints", async (data) => {
-      if (data.gameCode && data.index) {
+      console.log("@@@@@@@@@ data : ", data, data.gameCode, data.index);
+      if (data.gameCode && data.index >= 0) {
+        console.log("we are inside of the if loop ");
         //We will find the query and mark it as scored
         let game = await Game.findOne({ gameCode: data.gameCode });
         let query = game.queries[data.index];
         query.scored = true;
         query.answer = data.answer;
         game.markModified("queries");
-        //await game.save();
+        await game.save();
         console.log(
           "************************** we have updated the scores ***********************"
         );
@@ -447,21 +449,27 @@ const setUpSockets = () => {
               //Find the team that matches the student's team
               let team = game.teams.filter((team) => {
                 console.log("team name, student name", team.name, student.team);
-                return team.name == student.team;
+                if (student.team) {
+                  return team.name == student.team;
+                } else {
+                  return false;
+                }
               });
-              console.log(
-                "the team and team score is : ",
-                team[0],
-                team[0].score
-              );
-
-              team[0].score += 1;
-              game.markModified("teams");
-              console.log(
-                "the team and team score is : ",
-                team[0],
-                team[0].score
-              );
+              //Ensure that we have a team to assign points to.
+              if (team[0]) {
+                console.log(
+                  "the team and team score is : ",
+                  team[0],
+                  team[0].score
+                );
+                team[0].score += 1;
+                game.markModified("teams");
+                console.log(
+                  "the team and team score is : ",
+                  team[0],
+                  team[0].score
+                );
+              }
             }
           }
         }
