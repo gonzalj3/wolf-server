@@ -22,8 +22,10 @@ app.use(cookieParser());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 const whitelist = [
-  "http://localhost:3000",
-  "https://wolfgamebeta.herokuapp.com/",
+  "http://192.168.1.38",
+  "http://192.168.1.38:3000",
+  "https://testwolffe.herokuapp.com",
+  "https://wolfgamebeta.herokuapp.com",
 ];
 var corsOptions = {
   origin: function (origin, callback) {
