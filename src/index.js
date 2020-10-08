@@ -17,6 +17,7 @@ dotenv.config();
 
 const app = express();
 const whitelist = [
+  "http://localhost:3000",
   "http://192.168.1.38",
   "http://192.168.1.38:3000",
   "https://testwolffe.herokuapp.com",
