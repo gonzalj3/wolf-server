@@ -1,6 +1,4 @@
 import express from "express";
-import socketio from "socket.io";
-//import http from "http";
 import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./models/index.js";
@@ -18,11 +16,6 @@ const { json, urlencoded } = express;
 dotenv.config();
 
 const app = express();
-app.use(cors());
-
-app.use(cookieParser());
-app.use(json());
-app.use(urlencoded({ extended: true }));
 const whitelist = [
   "http://192.168.1.38",
   "http://192.168.1.38:3000",
@@ -45,6 +38,12 @@ var corsOptions = {
   })
 );*/
 //app.use(cors(corsOptions));
+app.use(cors());
+
+app.use(cookieParser());
+app.use(json());
+app.use(urlencoded({ extended: true }));
+
 app.use("/api", router);
 app.use("/api/game/", gameRouter);
 app.use("/api/joinGame/", joinGameRouter);
