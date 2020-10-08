@@ -42,8 +42,8 @@ var corsOptions = {
     credentials: true,
   })
 );*/
-app.use(cors(corsOptions));
-
+//app.use(cors(corsOptions));
+app.use(cors());
 app.use("/api", router);
 app.use("/api/game/", gameRouter);
 app.use("/api/joinGame/", joinGameRouter);
