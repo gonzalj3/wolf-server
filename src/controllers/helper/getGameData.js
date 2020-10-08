@@ -17,17 +17,17 @@ const GetGameData = async (gameCode) => {
     gameCode: gameFound.gameCode,
   };
 
-  for (const teamID of gameFound.teams) {
-    let team = await Team.findById(teamID);
+  for (const team of gameFound.teams) {
+    //let team = await Team.findById(teamID);
     //console.log("team ", team.name, team);
-    (returnData.droppable[teamID] = {
-      id: teamID,
+    (returnData.droppable[team._id] = {
+      id: team._id,
       name: team.name,
       score: team.score,
       color: team.color,
       students: team.students,
     }),
-      returnData.TeamOrder.push(teamID);
+      returnData.TeamOrder.push(team._id);
   }
   returnData.students = {};
   gameFound.roster.forEach((element) => {
@@ -52,12 +52,13 @@ const GetGameData = async (gameCode) => {
       type: gameFound.queries[gameFound.queries.length - 1].type,
       index: gameFound.queries.length - 1,
       answer: gameFound.queries[gameFound.queries.length - 1].answer,
+      scored: gameFound.queries[gameFound.queries.length - 1].scored,
     };
   } else {
     returnData.question = null;
   }
   //Returning all current game query responses, by first checking that we have a current question in progress.
-  console.log("queries : ", gameFound.queries);
+  //console.log("queries : ", gameFound.queries);
   if (
     gameFound.queries.length > 0 &&
     !gameFound.queries[gameFound.queries.length - 1].answer

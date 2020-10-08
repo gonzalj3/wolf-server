@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import Player from "../models/Player.js";
 import Query from "../models/Query.js";
+import Team from "../models/Team.js";
 
 /* @desc: The Game schema. Contains arrays of other schemas.
  */
@@ -18,12 +19,7 @@ const Game = new mongoose.Schema({
   },
   //The declaration for roster originally was roster:[Player.schema]
   roster: [Player.schema],
-  teams: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "Team",
-    },
-  ],
+  teams: [Team.schema],
   queries: [
     Query.schema,
 

@@ -21,12 +21,26 @@ const app = express();
 app.use(cookieParser());
 app.use(json());
 app.use(urlencoded({ extended: true }));
-app.use(
+const whitelist = [
+  "http://localhost:3000",
+  "https://wolfgamebeta.herokuapp.com/",
+];
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+};
+/*app.use(
   cors({
     origin: "http://localhost:3000",
     credentials: true,
   })
-);
+);*/
+app.use(cors(corsOptions));
 
 app.use("/api", router);
 app.use("/api/game/", gameRouter);
