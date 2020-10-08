@@ -1,4 +1,6 @@
 import express from "express";
+import cors from "cors";
+
 let router = express.Router();
 import { registerController, logInController } from "../controllers/aut.js";
 import expressValidator from "express-validator";
