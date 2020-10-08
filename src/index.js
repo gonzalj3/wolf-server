@@ -18,6 +18,8 @@ const { json, urlencoded } = express;
 dotenv.config();
 
 const app = express();
+app.use(cors());
+
 app.use(cookieParser());
 app.use(json());
 app.use(urlencoded({ extended: true }));
@@ -43,7 +45,6 @@ var corsOptions = {
   })
 );*/
 //app.use(cors(corsOptions));
-app.use(cors());
 app.use("/api", router);
 app.use("/api/game/", gameRouter);
 app.use("/api/joinGame/", joinGameRouter);
