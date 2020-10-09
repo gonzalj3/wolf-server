@@ -9,9 +9,9 @@ import Query from "../models/Query.js";
 import GetGameData from "../controllers/helper/getGameData.js";
 import cors from "cors";
 
-const setUpSockets = () => {
-  socketApp = express()
-    const whitelist = [
+const setUpSockets = (app) => {
+  socketApp = app //= express()
+    /*const whitelist = [
     "http://localhost:3000",
     "http://172.20.10.4",
     "http://172.20.10.4:3000",
@@ -28,7 +28,7 @@ const setUpSockets = () => {
         callback(new Error("Not allowed by CORS"));
       }
     },
-  };
+  };*/
   //socketApp.use(cors(corsOptions))
   /*socketApp.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
