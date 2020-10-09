@@ -1,4 +1,4 @@
-import http from "https";
+import http from "http";
 import express from "express";
 import socketio from "socket.io";
 import Game from "../models/Game.js";
@@ -9,7 +9,12 @@ import GetGameData from "../controllers/helper/getGameData.js";
 import cors from "cors";
 
 const setUpSockets = () => {
-  const serverWebSocket = http.createServer(express);
+  socketApp = express()
+  socketApp.use(cors({
+    origin: "https://testwolffe.herokuapp.com",
+    credentials : true
+  }))
+  const serverWebSocket = http.createServer(socketApp); //use to just pass express// 
   /*const whitelist = [
     "http://localhost:3000",
     "http://172.20.10.4",
@@ -30,18 +35,9 @@ const setUpSockets = () => {
   };
   serverWebSocket.use(cors(corsOptions))*/
 
-  const io = socketio(serverWebSocket, {
-    handlePreflightRequest: (req, res) => {
-        const headers = {
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-            "Access-Control-Allow-Origin": req.headers.origin, //or the specific origin you want to give access to,
-            "Access-Control-Allow-Credentials": true
-        };
-        res.writeHead(200, headers);
-        res.end();
-    }
-});
+  const io = socketio(serverWebSocket);
   //io.origins('*')
+
   serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
   );
