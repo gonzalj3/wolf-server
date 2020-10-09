@@ -10,12 +10,7 @@ import cors from "cors";
 
 const setUpSockets = () => {
   socketApp = express()
-  socketApp.use(cors({
-    origin: "https://testwolffe.herokuapp.com",
-    credentials : true
-  }))
-  const serverWebSocket = http.createServer(socketApp); //use to just pass express// 
-  /*const whitelist = [
+    const whitelist = [
     "http://localhost:3000",
     "http://172.20.10.4",
     "http://172.20.10.4:3000",
@@ -33,7 +28,14 @@ const setUpSockets = () => {
       }
     },
   };
-  serverWebSocket.use(cors(corsOptions))*/
+  socketApp.use(cors(corsOptions))
+  /*socketApp.use(cors({
+    origin: "https://testwolffe.herokuapp.com",
+    credentials : true
+  }))*/
+  const serverWebSocket = http.createServer(socketApp); //use to just pass express// 
+
+  //serverWebSocket.use(cors(corsOptions))
 
   const io = socketio(serverWebSocket);
   //io.origins('*')
