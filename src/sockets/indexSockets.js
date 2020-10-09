@@ -10,7 +10,7 @@ import cors from "cors";
 
 const setUpSockets = () => {
   const serverWebSocket = http.createServer(express);
-  const whitelist = [
+  /*const whitelist = [
     "http://localhost:3000",
     "http://172.20.10.4",
     "http://172.20.10.4:3000",
@@ -28,8 +28,19 @@ const setUpSockets = () => {
       }
     },
   };
-  serverWebSocket.use(cors(corsOptions))
-  const io = socketio(serverWebSocket);
+  serverWebSocket.use(cors(corsOptions))*/
+
+  const io = socketio(serverWebSocket, {
+    handlePreflightRequest: (req, res) => {
+        const headers = {
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Origin": req.headers.origin, //or the specific origin you want to give access to,
+            "Access-Control-Allow-Credentials": true
+        };
+        res.writeHead(200, headers);
+        res.end();
+    }
+});
   //io.origins('*')
   serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
