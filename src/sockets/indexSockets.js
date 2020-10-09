@@ -29,11 +29,11 @@ const setUpSockets = () => {
     },
   };
   //socketApp.use(cors(corsOptions))
-  socketApp.use(function (req, res, next) {
+  /*socketApp.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
     res.header('Access-Control-Allow-Credentials', true)
     next()
-  })
+  })*/
   /*socketApp.use(cors({
     origin: "https://testwolffe.herokuapp.com",
     credentials : true
@@ -42,7 +42,17 @@ const setUpSockets = () => {
 
   //serverWebSocket.use(cors(corsOptions))
 
-  const io = socketio(serverWebSocket);
+  const io = socketio(serverWebSocket, {
+    handlePreflightRequest: (req, res) => {
+        const headers = {
+            "Access-Control-Allow-Headers": "Content-Type, Authorization",
+            "Access-Control-Allow-Origin": req.headers.origin, //or the specific origin you want to give access to,
+            "Access-Control-Allow-Credentials": true
+        };
+        res.writeHead(200, headers);
+        res.end();
+    }
+});
   //io.origins('*')
 
   serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
