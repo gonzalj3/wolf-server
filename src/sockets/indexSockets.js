@@ -1,4 +1,4 @@
-import http from "http";
+import http from "https";
 import express from "express";
 import socketio from "socket.io";
 import Game from "../models/Game.js";
@@ -10,9 +10,9 @@ import cors from "cors";
 
 const setUpSockets = () => {
   const serverWebSocket = http.createServer(express);
-  serverWebSocket.use(cors())
+  //serverWebSocket.use(cors())
   const io = socketio(serverWebSocket);
-
+  io.origins('*')
   serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
   );
