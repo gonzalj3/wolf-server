@@ -10,7 +10,7 @@ import cors from "cors";
 
 const setUpSockets = () => {
   const serverWebSocket = http.createServer(express);
-  serverWebSocket.use(cors());
+  serverWebSocket.use(cors())
   const io = socketio(serverWebSocket);
 
   serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
@@ -21,7 +21,7 @@ const setUpSockets = () => {
   let teacherID = null;
   gameSocket.on("connection", (socket) => {
     //Teachers joins a room
-    socket.on("registerSocket", async (gameData) => {
+    socket.on("", async (gameData) => {
       console.log("gameData is : ", gameData);
       console.log("teacher Socket ID", socket.id);
       console.log("type of socket: ", typeof socket.id);
