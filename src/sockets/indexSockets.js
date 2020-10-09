@@ -1,4 +1,5 @@
 import http from "http";
+import https from "https";
 import express from "express";
 import socketio from "socket.io";
 import Game from "../models/Game.js";
@@ -38,7 +39,7 @@ const setUpSockets = () => {
     origin: "https://testwolffe.herokuapp.com",
     credentials : true
   }))*/
-  const serverWebSocket = http.createServer(socketApp); //use to just pass express// 
+  const serverWebSocket = https.createServer(socketApp); //use to just pass express// 
 
   //serverWebSocket.use(cors(corsOptions))
 
