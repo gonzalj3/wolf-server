@@ -6,9 +6,11 @@ import Team from "../models/Team.js";
 import Player from "../models/Player.js";
 import Query from "../models/Query.js";
 import GetGameData from "../controllers/helper/getGameData.js";
+import cors from "cors";
 
 const setUpSockets = () => {
   const serverWebSocket = http.createServer(express);
+  serverWebSocket.use(cors());
   const io = socketio(serverWebSocket);
 
   serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
