@@ -11,7 +11,7 @@ import cors from "cors";
 
 const setUpSockets = () => {
   const socketApp = express()
-    /*const whitelist = [
+    const whitelist = [
     "http://localhost:3000",
     "http://172.20.10.4",
     "http://172.20.10.4:3000",
@@ -28,8 +28,8 @@ const setUpSockets = () => {
         callback(new Error("Not allowed by CORS"));
       }
     },
-  };*/
-  //socketApp.use(cors(corsOptions))
+  };
+  socketApp.use(cors(corsOptions))
   /*socketApp.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", req.headers.origin);
     res.header('Access-Control-Allow-Credentials', true)
