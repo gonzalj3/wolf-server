@@ -10,9 +10,27 @@ import cors from "cors";
 
 const setUpSockets = () => {
   const serverWebSocket = http.createServer(express);
-  //serverWebSocket.use(cors())
+  const whitelist = [
+    "http://localhost:3000",
+    "http://172.20.10.4",
+    "http://172.20.10.4:3000",
+    "http://192.168.1.38",
+    "http://192.168.1.38:3000",
+    "https://testwolffe.herokuapp.com",
+    "https://wolfgamebeta.herokuapp.com",
+  ];
+  var corsOptions = {
+    origin: function (origin, callback) {
+      if (whitelist.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  };
+  serverWebSocket.use(cors(corsOptions))
   const io = socketio(serverWebSocket);
-  io.origins('*')
+  //io.origins('*')
   serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
   );
