@@ -16,7 +16,7 @@ const { json, urlencoded } = express;
 dotenv.config();
 
 const app = express();
-const whitelist = [
+/*const whitelist = [
   "http://localhost:3000",
   "http://192.168.1.38",
   "http://192.168.1.38:3000",
@@ -31,17 +31,28 @@ var corsOptions = {
       callback(new Error("Not allowed by CORS"));
     }
   },
-};
+};*/
 /*app.use(
   cors({
     origin: "http://localhost:3000",
     credentials: true,
   })
 );*/
-app.use(cors(corsOptions));
+//app.use(cors(corsOptions));
 
 //app.use(cors());
-
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "POST, GET, PATCH, DELETE, OPTIONS"
+  );
+  next();
+});
 app.use(cookieParser());
 app.use(json());
 app.use(urlencoded({ extended: true }));
