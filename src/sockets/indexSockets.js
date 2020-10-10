@@ -39,12 +39,12 @@ const setUpSockets = (app) => {
     origin: "https://testwolffe.herokuapp.com",
     credentials : true
   }))*/
-  https.listen(process.env.WEBSOCKETPORT)
   const serverWebSocket = https.createServer(socketApp); //use to just pass express// 
 
   //serverWebSocket.use(cors(corsOptions))
+  //https.listen(process.env.WEBSOCKETPORT)
 
-  const io = socketio(serverWebSocket, {
+  const io = socketio(serverWebSocket) /*, {
     handlePreflightRequest: (req, res) => {
         const headers = {
             "Access-Control-Allow-Headers": "Content-Type, Authorization",
@@ -54,7 +54,7 @@ const setUpSockets = (app) => {
         res.writeHead(200, headers);
         res.end();
     }
-});
+});*/
   //io.origins('*')
 
   /*serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
@@ -526,6 +526,11 @@ const setUpSockets = (app) => {
       }
     });
   });
+
+  https.listen(process.env.WEBSOCKETPORT)
+
 };
+
+
 
 export { setUpSockets };
