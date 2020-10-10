@@ -12,11 +12,11 @@ import cors from "cors";
 const setUpSockets = (app) => {
 
   const serverWebSocket = http.createServer(app); //use to just pass express// 
-  http.listen(process.env.PORT)
+  //http.listen(process.env.PORT)
   //https.listen(process.env.WEBSOCKETPORT)
-  /*serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
+  serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
-  );*/
+  );
   const io = socketio(serverWebSocket, {transports: ['websocket']}) 
 
 
