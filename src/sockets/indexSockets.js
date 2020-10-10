@@ -10,7 +10,7 @@ import GetGameData from "../controllers/helper/getGameData.js";
 import cors from "cors";
 
 const setUpSockets = (app) => {
-  const socketApp = app //= express()
+  //const socketApp = app //= express()
     /*const whitelist = [
     "http://localhost:3000",
     "http://172.20.10.4",
@@ -39,10 +39,10 @@ const setUpSockets = (app) => {
     origin: "https://testwolffe.herokuapp.com",
     credentials : true
   }))*/
-  const serverWebSocket = https.createServer(socketApp); //use to just pass express// 
+  const serverWebSocket = https.createServer(app); //use to just pass express// 
 
   //serverWebSocket.use(cors(corsOptions))
-  https.listen(process.env.WEBSOCKETPORT)
+  //https.listen(process.env.WEBSOCKETPORT)
 
   const io = socketio(serverWebSocket) /*, {
     handlePreflightRequest: (req, res) => {
@@ -57,9 +57,9 @@ const setUpSockets = (app) => {
 });*/
   //io.origins('*')
 
-  /*serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
+  serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
-  );*/
+  );
 
   let gameSocket = io.of("/game");
   let teacherID = null;
