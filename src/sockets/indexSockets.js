@@ -18,7 +18,9 @@ const setUpSockets = (app) => {
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
   );*/
   const io = socketio(serverWebSocket, {transports: ['websocket']}) 
-
+  app.listen(process.env.PORT, () =>
+    console.log(`express app listening on port ` + process.env.PORT)
+  );
 
 
   let gameSocket = io.of("/game");
