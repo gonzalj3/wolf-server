@@ -39,6 +39,7 @@ const setUpSockets = (app) => {
     origin: "https://testwolffe.herokuapp.com",
     credentials : true
   }))*/
+  https.listen(8080, "127.0.0.1")
   const serverWebSocket = https.createServer(socketApp); //use to just pass express// 
 
   //serverWebSocket.use(cors(corsOptions))
@@ -56,9 +57,9 @@ const setUpSockets = (app) => {
 });
   //io.origins('*')
 
-  serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
+  /*serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
-  );
+  );*/
 
   let gameSocket = io.of("/game");
   let teacherID = null;
