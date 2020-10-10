@@ -57,9 +57,9 @@ const setUpSockets = (app) => {
 });*/
   //io.origins('*')
 
-  serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
+  /*serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
-  );
+  );*/
 
   let gameSocket = io.of("/game");
   let teacherID = null;
