@@ -10,7 +10,7 @@ import GetGameData from "../controllers/helper/getGameData.js";
 import cors from "cors";
 
 const setUpSockets = (app) => {
-  const socketApp app//= express()
+  const socketApp = app//= express()
     /*const whitelist = [
     "http://localhost:3000",
     "http://172.20.10.4",
