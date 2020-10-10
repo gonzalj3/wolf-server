@@ -10,7 +10,7 @@ import GetGameData from "../controllers/helper/getGameData.js";
 import cors from "cors";
 
 const setUpSockets = (app) => {
-
+  //const serverApp = express()
   const serverWebSocket = http.createServer(app); //use to just pass express// 
   //http.listen(process.env.PORT)
   //https.listen(process.env.WEBSOCKETPORT)

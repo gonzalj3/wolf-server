@@ -66,8 +66,8 @@ app.use("/api/joinGame/", joinGameRouter);
 app.use(errorHandler);
 
 connectDB().then(async () => {
-  app.listen(process.env.PORT, () =>
+  /*app.listen(process.env.PORT, () =>
     console.log(`express app listening on port ` + process.env.PORT)
-  );
+  );*/
   setUpSockets(app);
 });
