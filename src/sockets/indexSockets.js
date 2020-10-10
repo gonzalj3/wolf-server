@@ -10,56 +10,16 @@ import GetGameData from "../controllers/helper/getGameData.js";
 import cors from "cors";
 
 const setUpSockets = (app) => {
-  //const socketApp = app //= express()
-    /*const whitelist = [
-    "http://localhost:3000",
-    "http://172.20.10.4",
-    "http://172.20.10.4:3000",
-    "http://192.168.1.38",
-    "http://192.168.1.38:3000",
-    "https://testwolffe.herokuapp.com",
-    "https://wolfgamebeta.herokuapp.com",
-  ];
-  var corsOptions = {
-    origin: function (origin, callback) {
-      if (whitelist.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-  };
-  socketApp.use(cors(corsOptions))*/
-  /*socketApp.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", req.headers.origin);
-    res.header('Access-Control-Allow-Credentials', true)
-    next()
-  })*/
-  /*socketApp.use(cors({
-    origin: "https://testwolffe.herokuapp.com",
-    credentials : true
-  }))*/
+
   const serverWebSocket = http.createServer(app); //use to just pass express// 
-
-  //serverWebSocket.use(cors(corsOptions))
+  //http.listen(process.env.WEBSOCKETPORT)
   //https.listen(process.env.WEBSOCKETPORT)
-
-  const io = socketio(serverWebSocket, {transports: ['websocket']}) /*, {
-    handlePreflightRequest: (req, res) => {
-        const headers = {
-            "Access-Control-Allow-Headers": "Content-Type, Authorization",
-            "Access-Control-Allow-Origin": req.headers.origin, //or the specific origin you want to give access to,
-            "Access-Control-Allow-Credentials": true
-        };
-        res.writeHead(200, headers);ß
-        res.end();
-    }
-});*/
-  //io.origins('*')
-
   /*serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
   );*/
+  const io = socketio(serverWebSocket, {transports: ['websocket']}) 
+
+
 
   let gameSocket = io.of("/game");
   let teacherID = null;
