@@ -10,7 +10,7 @@ import GetGameData from "../controllers/helper/getGameData.js";
 import cors from "cors";
 
 const setUpSockets = (app) => {
-  const socketApp = app//express()
+  const socketApp = express()
     /*const whitelist = [
     "http://localhost:3000",
     "http://172.20.10.4",
@@ -42,7 +42,7 @@ const setUpSockets = (app) => {
   const serverWebSocket = https.createServer(socketApp); //use to just pass express// 
 
   //serverWebSocket.use(cors(corsOptions))
-  //https.listen(process.env.WEBSOCKETPORT)
+  https.listen(process.env.WEBSOCKETPORT)
 
   const io = socketio(serverWebSocket) /*, {
     handlePreflightRequest: (req, res) => {
@@ -527,8 +527,7 @@ const setUpSockets = (app) => {
     });
   });
 
-  https.listen(process.env.WEBSOCKETPORT)
-
+  //https.listen(process.env.WEBSOCKETPORT)
 };
 
 
