@@ -11,18 +11,19 @@ import cors from "cors";
 
 const setUpSockets = (app) => {
   //const serverApp = express()
-  const serverWebSocket = http.createServer(app); //use to just pass express// 
+  const appListen = app.listen(process.env.PORT, () =>
+    console.log(`express app listening on port ` + process.env.PORT)
+  );
+  const serverWebSocket = http.createServer(appListen); //use to just pass express// 
   //http.listen(process.env.WEBSOCKETPORT)
   //https.listen(process.env.)
-  serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
+  /*serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
-  );
+  );*/
   const io = socketio(serverWebSocket, {transports: ['websocket']}) 
   //const io = socketio(app, {transports: ['websocket']}) 
 
-  app.listen(process.env.PORT, () =>
-    console.log(`express app listening on port ` + process.env.PORT)
-  );
+  
 
 
   let gameSocket = io.of("/game");
