@@ -17,9 +17,9 @@ const setUpSockets = (app) => {
   const serverWebSocket = http.createServer(appListen); //use to just pass express// 
   //http.listen(process.env.WEBSOCKETPORT)
   //https.listen(process.env.)
-  /*serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
+  serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
-  );*/
+  );
   const io = socketio(serverWebSocket, {transports: ['websocket']}) 
   //const io = socketio(app, {transports: ['websocket']}) 
 
