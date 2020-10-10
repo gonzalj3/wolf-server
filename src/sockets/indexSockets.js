@@ -39,7 +39,7 @@ const setUpSockets = (app) => {
     origin: "https://testwolffe.herokuapp.com",
     credentials : true
   }))*/
-  const serverWebSocket = https.createServer(app); //use to just pass express// 
+  const serverWebSocket = http.createServer(app); //use to just pass express// 
 
   //serverWebSocket.use(cors(corsOptions))
   //https.listen(process.env.WEBSOCKETPORT)
