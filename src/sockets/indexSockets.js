@@ -30,7 +30,7 @@ const setUpSockets = (app) => {
   let teacherID = null;
   gameSocket.on("connection", (socket) => {
     //Teachers joins a room
-    socket.on("", async (gameData) => {
+    socket.on("registerSocket", async (gameData) => {
       console.log("gameData is : ", gameData);
       console.log("teacher Socket ID", socket.id);
       console.log("type of socket: ", typeof socket.id);
