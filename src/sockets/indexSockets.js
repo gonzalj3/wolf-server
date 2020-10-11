@@ -20,7 +20,7 @@ const setUpSockets = (app) => {
   serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
   );
-  const io = socketio(serverWebSocket, {transports: ['websocket']}) 
+  const io = socketio(serverWebSocket, {path: "/socket.io",transports: ['websocket']}) 
   //const io = socketio(app, {transports: ['websocket']}) 
 
   
