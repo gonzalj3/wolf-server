@@ -17,18 +17,18 @@ const setUpSockets = (app) => {
   const serverWebSocket = http.createServer(app); //use to just pass express// 
   //http.listen(process.env.WEBSOCKETPORT)
   //https.listen(process.env.)
-  /*serverWebSocket.listen(process.env.WEBSOCKETPORT, () =>{
+  serverWebSocket.listen(process.env.PORT, () =>{
     console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
      
     
 
-  });*/
+  });
   const io = socketio.listen(serverWebSocket, {path: "/socket.io",transports: ['websocket']}) 
   //const io = socketio(app, {transports: ['websocket']}) 
 
-  app.listen(process.env.PORT, () =>
+  /*app.listen(process.env.PORT, () =>
     console.log(`express app listening on port ` + process.env.PORT));
-
+*/
 
   let gameSocket = io.of("/game");
   let teacherID = null;
