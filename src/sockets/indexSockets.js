@@ -14,7 +14,7 @@ const setUpSockets = (app) => {
   const serverWebSocket = http.createServer(app); //use to just pass express// 
 
   serverWebSocket.listen(process.env.PORT, () =>{
-    console.log(" websocket listening on port " + process.env.WEBSOCKETPORT)
+    console.log(" websocket listening on port " + process.env.PORT)
   });
   const io = socketio.listen(serverWebSocket, {path: "/socket.io",transports: ['websocket']}) 
 
@@ -52,7 +52,7 @@ const setUpSockets = (app) => {
           if (gameFound.roster[index].name === data.name) {
             console.log("A player with that name already exists in the game.");
             let returnData = await GetGameData(data.room);
-
+            //returnData.
             socket.emit("gameData", returnData);
             return;
           }
@@ -120,6 +120,12 @@ const setUpSockets = (app) => {
 
           let updatedGame = await game.save();
           console.log("our updated game is now : ", updatedGame);
+          //socket back an update on color to "primary"
+          let newTeamData = {
+            color:"primary"
+          }
+          //socket.emit("colorUpdate", newTeamData)
+          socket.to(socket.id).emit("colorUpdate", data);
         }
       } else {
         //Find the team that we are taking the student to.
@@ -135,7 +141,23 @@ const setUpSockets = (app) => {
           //Mark and save changes to teamTo
           game.markModified("teams");
           let newGame = await game.save();
+          //update roster array in Game Schema
+          for (let student of game.roster) {
+            if (student.id == data.student) {
+              student.team = teamTo.name;
+              //console.log("studnet team i now : ", student.team);
+            }
+          }
           //console.log("************ team is saved : ", newGame.teams);
+
+          //socket back an update on color which is the team color listedi in teamTo.color
+          let newTeamData = {
+            color:teamTo.name
+          }
+          //socket.emit("colorUpdate", newTeamData)
+          gameSocket.to(socket.id).emit("colorUpdate", newTeamData);
+          console.log("we have sent data to update team color", socket.id, newTeamData)
+
         }
         //Ensure that we need to find a team in database / roster is the frontends staging area for students i.e. they dont have a team yet.
         //Once we knew we have a team for which the student is part of we remove the student from that team
@@ -161,12 +183,7 @@ const setUpSockets = (app) => {
           }
         }
 
-        for (let student of game.roster) {
-          if (student.id == data.student) {
-            student.team = teamTo.name;
-            //console.log("studnet team i now : ", student.team);
-          }
-        }
+
         game.markModified("roster");
 
         let updatedGame = await game.save();
@@ -484,7 +501,6 @@ const setUpSockets = (app) => {
     });
   });
 
-  //https.listen(process.env.WEBSOCKETPORT)
 };
 
 
