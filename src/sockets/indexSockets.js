@@ -37,6 +37,30 @@ const setUpSockets = (app) => {
     });
 
     //Student joins a game here.
+    //need to remake to find student and store the socket.id. 
+    socket.on("updateSocketStudent", async (data) => {
+      console.log("updating socket student with : ", data)
+      let gameFound = await Game.findOne({
+        gameCode: data.room
+      })
+
+      let student = gameFound.roster.find(
+        (candidate) => {
+         console.log(candidate, data)
+          if(candidate.name == data.name) {
+            return true
+          }
+          return false
+        }
+          )
+      student.socket = socket.id
+      gameFound.markModified("roster")
+      await gameFound.save()
+      let returnData = await GetGameData(data.room);
+      //returnData.
+      socket.emit("gameData", returnData);
+      return;
+    })
     socket.on("joinGameRoom", async (data) => {
       console.log("student joining game socket id", socket.id);
       socket.join(data.room);
@@ -63,6 +87,7 @@ const setUpSockets = (app) => {
         team: null,
         queries: [],
         responses: [],
+        socket: socket.id
       });
       //await newUser.save();
       gameFound.queries.forEach((item, index) => {
@@ -96,11 +121,13 @@ const setUpSockets = (app) => {
         gameCode: data.gameCode,
       });
       let gameRoster = game.roster;
+      let studentTarget = null
       //We are moving a student to not have a team at all i.e. on the frontend we place the student in the roster staging area.
       if (data.to == "roster") {
         for (let student of game.roster) {
           if (student.id == data.student) {
             student.team = null;
+            studentTarget = student
           }
         }
         game.markModified("roster");
@@ -125,7 +152,7 @@ const setUpSockets = (app) => {
             color:"primary"
           }
           //socket.emit("colorUpdate", newTeamData)
-          socket.to(socket.id).emit("colorUpdate", data);
+          socket.to(studentTarget.socket).emit("colorUpdate", data);
         }
       } else {
         //Find the team that we are taking the student to.
@@ -149,13 +176,13 @@ const setUpSockets = (app) => {
             }
           }
           //console.log("************ team is saved : ", newGame.teams);
-
+          console.log("student found is : ", student)
           //socket back an update on color which is the team color listedi in teamTo.color
           let newTeamData = {
             color:teamTo.name
           }
           //socket.emit("colorUpdate", newTeamData)
-          gameSocket.to(socket.id).emit("colorUpdate", newTeamData);
+          gameSocket.to(student.socket).emit("colorUpdate", newTeamData);
           console.log("we have sent data to update team color", socket.id, newTeamData)
 
         }

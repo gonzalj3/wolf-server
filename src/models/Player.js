@@ -25,6 +25,9 @@ const Player = new mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  socket: {
+    type: String,
+  },
 });
 export default mongoose.model("Player", Player);
 /* @desc: Before saving the user instance/document the password is hashed.
