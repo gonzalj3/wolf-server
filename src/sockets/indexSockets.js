@@ -37,7 +37,6 @@ const setUpSockets = (app) => {
     });
 
     //Student joins a game here.
-    //need to remake to find student and store the socket.id. 
     socket.on("joinGameRoom", async (data) => {
       console.log("student joining game socket id", socket.id);
       socket.join(data.room);
