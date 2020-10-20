@@ -38,29 +38,6 @@ const setUpSockets = (app) => {
 
     //Student joins a game here.
     //need to remake to find student and store the socket.id. 
-    socket.on("updateSocketStudent", async (data) => {
-      console.log("updating socket student with : ", data)
-      let gameFound = await Game.findOne({
-        gameCode: data.room
-      })
-
-      let student = gameFound.roster.find(
-        (candidate) => {
-         console.log(candidate, data)
-          if(candidate.name == data.name) {
-            return true
-          }
-          return false
-        }
-          )
-      student.socket = socket.id
-      gameFound.markModified("roster")
-      await gameFound.save()
-      let returnData = await GetGameData(data.room);
-      //returnData.
-      socket.emit("gameData", returnData);
-      return;
-    })
     socket.on("joinGameRoom", async (data) => {
       console.log("student joining game socket id", socket.id);
       socket.join(data.room);
@@ -75,6 +52,9 @@ const setUpSockets = (app) => {
         for (let index = 0; index < gameFound.roster.length; index++) {
           if (gameFound.roster[index].name === data.name) {
             console.log("A player with that name already exists in the game.");
+            gameFound.roster[index].socket = socket.id
+            gameFound.markModified("roster")
+            await gameFound.save()
             let returnData = await GetGameData(data.room);
             //returnData.
             socket.emit("gameData", returnData);
@@ -170,7 +150,7 @@ const setUpSockets = (app) => {
           let newGame = await game.save();
           //update roster array in Game Schema
           for (let student of game.roster) {
-            if (student.id == data.student) {
+            if (student.id === data.student) {
               student.team = teamTo.name;
               //console.log("studnet team i now : ", student.team);
             }
@@ -183,7 +163,7 @@ const setUpSockets = (app) => {
           }
           //socket.emit("colorUpdate", newTeamData)
           gameSocket.to(student.socket).emit("colorUpdate", newTeamData);
-          console.log("we have sent data to update team color", socket.id, newTeamData)
+          console.log("we have sent data to update team color", student.socket, newTeamData)
 
         }
         //Ensure that we need to find a team in database / roster is the frontends staging area for students i.e. they dont have a team yet.
