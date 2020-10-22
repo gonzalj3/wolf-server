@@ -23,17 +23,19 @@ const setUpSockets = (app) => {
   gameSocket.on("connection", (socket) => {
     //Teachers joins a room
     socket.on("registerSocket", async (gameData) => {
+      socket.join(gameData.gameCode);
+
       console.log("gameData is : ", gameData);
+      //console.log("previous teacher socket is : ")
       console.log("teacher Socket ID", socket.id);
       console.log("type of socket: ", typeof socket.id);
       if (gameData != null) {
-        let document = await Game.findOneAndUpdate(
+        console.log("updaing game")
+        await Game.findOneAndUpdate(
           { gameCode: gameData.gameCode },
           { teacherSocket: socket.id }
         );
-        console.log(`socket ${document.teacherSocket} `);
       }
-      socket.join(gameData.gameCode);
     });
 
     //Student joins a game here.
@@ -55,8 +57,7 @@ const setUpSockets = (app) => {
             gameFound.markModified("roster")
             await gameFound.save()
             let returnData = await GetGameData(data.room);
-            //returnData.
-            socket.emit("gameData", returnData);
+            gameSocket.to(socket.id).emit("welcome", returnData)
             return;
           }
         }
@@ -85,8 +86,9 @@ const setUpSockets = (app) => {
       //await game.save();
       let returnData = await GetGameData(data.room);
       console.log("about to socket over data: ", returnData);
-      socket.emit("gameData", returnData);
-
+      //socket.emit("gameData", returnData);
+      console.log(`student socket : ${socket.id}`)
+      gameSocket.to(socket.id).emit("welcome", returnData)
       console.log(`teacherSocket: ${game.teacherSocket}`);
       socket.to(game.teacherSocket).emit("newStudent", returnData);
     });
@@ -284,6 +286,8 @@ const setUpSockets = (app) => {
     });
     socket.on("newQuestion", async (data) => {
       console.log(data);
+      let game = await Game.findOne({ gameCode: data.gameCode });
+
       switch (data.type) {
         case "TF":
           const tfQuestion = await Query.create({
@@ -291,15 +295,13 @@ const setUpSockets = (app) => {
           });
           //need to add logic here so that if the last question in the array
           //queries from game model has an unanswered portion we simply replace that one instead of adding a new one
-          let game = await Game.findOne({ gameCode: data.gameCode });
           if (
             game.queries.length - 1 >= 0 &&
             game.queries[game.queries.length - 1].answer == null
           ) {
             game.queries[game.queries.length - 1].type = "TF";
-            await game.save();
           } else {
-            let game = await Game.findOneAndUpdate(
+             await Game.findOneAndUpdate(
               { gameCode: data.gameCode },
               {
                 $addToSet: {
@@ -308,20 +310,15 @@ const setUpSockets = (app) => {
               },
               { new: true }
             );
-            await game.save();
           }
-
-          /*game.roster.forEach((item, index) => {
-            item.queries.push(tfQuestion);
-            console.log("the queries of a student", item.queries);
-
-            //item.save();
-          });*/
-          //await game.save();
-          let returnData = await GetGameData(data.gameCode);
-          gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
-        //console.log("we have TF");
       }
+      console.log("saving teachers socket from ", game.teacherSocket )
+      console.log("to : ", socket.id)
+
+      //game.teacherSocket = socket.id
+      await game.save();
+      let returnData = await GetGameData(data.gameCode);
+      gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
     });
     socket.on("setAnswer", async (data) => {
       /* Determine type of question, find game and the last query from queries array. 
@@ -351,14 +348,11 @@ const setUpSockets = (app) => {
     socket.on("studentAnswer", async (data) => {
       console.log("student :", data);
       let game = await Game.findOne({ gameCode: data.gameCode });
-      //console.log("game found: ", game);
       console.log("");
       var studentFound = game.roster.filter((student) => {
-        //console.log("")
         return student.name === data.student;
       });
-      //game.roster;
-      //console.log("the student found: ", studentFound);
+
       let lastQuestion = game.queries[game.queries.length - 1];
 
       //we need to ensure that we do not have an answer provided by the teacher we do this by looking at the answer property.
@@ -381,11 +375,12 @@ const setUpSockets = (app) => {
           console.log("savign student response");
           studentFound[0].responses[game.queries.length - 1] = data.answer;
 
-          let savedStudent = await studentFound[0].save();
-          savedStudent.markModified("responses");
+          //let savedStudent = await studentFound[0].save();
+          //savedStudent.markModified("responses");
+          game.markModified("roster")
           let savedGame = await game.save();
-          console.log("saved game: ", savedGame.roster);
-          console.log("saved student: ", savedStudent);
+          //console.log("saved game: ", savedGame.roster);
+          //console.log("saved student: ", savedStudent);
         }
       }
 
@@ -415,9 +410,15 @@ const setUpSockets = (app) => {
       populateReturnData.then(async (data) => {
         console.log("data in then :", data);
 
-        socket.to(game.teacherSocket).emit("newStudentAnswer", data);
-        console.log("we have sent returnData ");
+        gameSocket.to(game.teacherSocket).emit("newStudentAnswer", data);
+        //socket.to(game.teacherSocket).emit("newStudentAnswer", data);
+        //io.to(game.teacherSocket).emit("newStudentAnswer", data)
+
+        console.log("we have sent returnData ", game.teacherSocket);
       });
+      console.log("sending data outside of asyncy ")
+      //gameSocket.to(game.teacherSocket).emit("newStudentAnswer", [{name:"none", team:"none", response:"none"}]);
+
 
       //we need to communicate to the teacher here that we got new info for a student
     });
@@ -426,9 +427,12 @@ const setUpSockets = (app) => {
         let game = await Game.findOne({ gameCode: data.gameCode });
         game.queries[data.index].type = null;
         game.queries[data.index].answer = null;
-        game.save();
+        game.teacherSocket = socket.id
+        game.markModified("queries")
+        await game.save();
         let returnData = await GetGameData(data.gameCode);
         gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
+
       }
     });
     socket.on("pointChangeTeam", async (data) => {

@@ -23,7 +23,6 @@ const whitelist = [
   "http://192.168.1.38",
   "http://192.168.1.38:3000",
   "https://testwolffe.herokuapp.com",
-  "https://wolfgamebeta.herokuapp.com",
   "https://devwolfgame.herokuapp.com",
 ];
 var corsOptions = {
