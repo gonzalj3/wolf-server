@@ -8,6 +8,10 @@ import Player from "../models/Player.js";
 import Query from "../models/Query.js";
 import GetGameData from "../controllers/helper/getGameData.js";
 import cors from "cors";
+import Teacher from "../models/Teacher.js";
+import { randomGameCode } from "../util/randomGameCode.js";
+
+import { create } from "domain";
 
 const setUpSockets = (app) => {
 
@@ -16,7 +20,7 @@ const setUpSockets = (app) => {
   serverWebSocket.listen(process.env.PORT, () =>{
     console.log(" websocket listening on port " + process.env.PORT)
   });
-  const io = socketio.listen(serverWebSocket, {path: "/socket.io",transports: ['websocket']}) 
+  const io = socketio.listen(serverWebSocket, {path: "/socket.io",transports: ['websocket'], pingTimeout: 45000}) 
 
   let gameSocket = io.of("/game");
   let teacherID = null;
@@ -27,8 +31,8 @@ const setUpSockets = (app) => {
 
       console.log("gameData is : ", gameData);
       //console.log("previous teacher socket is : ")
-      console.log("teacher Socket ID", socket.id);
-      console.log("type of socket: ", typeof socket.id);
+      //console.log("teacher Socket ID", socket.id);
+      //console.log("type of socket: ", typeof socket.id);
       if (gameData != null) {
         console.log("updaing game")
         await Game.findOneAndUpdate(
@@ -90,7 +94,7 @@ const setUpSockets = (app) => {
       console.log(`student socket : ${socket.id}`)
       gameSocket.to(socket.id).emit("welcome", returnData)
       console.log(`teacherSocket: ${game.teacherSocket}`);
-      socket.to(game.teacherSocket).emit("newStudent", returnData);
+      gameSocket.to(game.teacherSocket).emit("newStudent", returnData);
     });
     socket.on("gameTime", async (room) => {
       console.log("got message on gameTime: ", message);
@@ -249,37 +253,7 @@ const setUpSockets = (app) => {
             },
           }
         );
-      } /*else if (game.teams.length == 4) {
-        const purple = await Team.create({
-          students: [],
-          color: "purple",
-          name: "purple",
-          score: 0,
-        });
-        await Game.findOneAndUpdate(
-          { gameCode: data.room },
-          {
-            $addToSet: {
-              teams: [purple],
-            },
-          }
-        );
-      } else if (game.teams.length == 5) {
-        const orange = await Team.create({
-          students: [],
-          color: "orange",
-          name: "orange",
-          score: 0,
-        });
-        await Game.findOneAndUpdate(
-          { gameCode: data.room },
-          {
-            $addToSet: {
-              teams: [orange],
-            },
-          }
-        );
-      }*/
+      } 
 
       let returnData = await GetGameData(data.room);
       gameSocket.in(data.room).emit("newTeamUpdate", returnData);
@@ -509,6 +483,48 @@ const setUpSockets = (app) => {
         gameSocket.in(data.gameCode).emit("setAnswerUpdate", returnData);
       }
     });
+    socket.on("endGame", async (data) => {
+      if(data.gameCode){
+        console.log("we got an end end game heres the data : ", data)
+        let teacher = await Teacher.findOne(
+          {
+            email: data.email,
+          }
+        )
+        if( teacher ){
+          console.log("teacher found : ", teacher)
+          let currentCode = randomGameCode(5);
+
+          //Create new team
+          let blue = await Team.create({
+            students: [],
+            color: "blue",
+            name: "blue",
+            score: 0,
+          })
+          //Create new game
+          let newGame = await Game.create({
+            gameCode: currentCode,
+            roster: [],
+            teams: [blue],
+            queries: [],
+          })
+
+          teacher.games.push(teacher.currentGame)
+          teacher.currentGame = newGame
+          teacher.markModified("games")
+          await teacher.save()
+          let returnData = {
+            gameCode: currentCode
+          }
+          gameSocket.to(socket.id).emit("newGameSet", returnData)
+          gameSocket.to(data.gameCode).emit("endGame",{gameCode: data.gameCode})
+          //console.log(" teacher update : ", teacher)
+        } else {
+          console.log("not teacher found")
+        }
+      }
+    })
   });
 
 };
