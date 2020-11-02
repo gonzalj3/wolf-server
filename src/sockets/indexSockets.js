@@ -20,7 +20,7 @@ const setUpSockets = (app) => {
   serverWebSocket.listen(process.env.PORT, () =>{
     console.log(" websocket listening on port " + process.env.PORT)
   });
-  const io = socketio.listen(serverWebSocket, {path: "/socket.io",transports: ['websocket'], pingTimeout: 45000}) 
+  const io = socketio.listen(serverWebSocket, {path: "/socket.io",transports: ['websocket'], pingTimeout: 90000}) 
 
   let gameSocket = io.of("/game");
   let teacherID = null;
