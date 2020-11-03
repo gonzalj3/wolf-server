@@ -308,8 +308,11 @@ const setUpSockets = (app) => {
 
           if (lastQuestion) {
             lastQuestion.answer = data.answer;
+            lastQuestion.scored = 'true';
+            game.markModified("queries")
+            await game.save();
+
           }
-          await game.save();
 
           console.log("here is the last question : ", lastQuestion);
           //May just remove teh queries for each student since we already store data.
@@ -397,12 +400,19 @@ const setUpSockets = (app) => {
       //we need to communicate to the teacher here that we got new info for a student
     });
     socket.on("cancelQuestion", async (data) => {
-      if (data.gameCode && data.index) {
+      if (data.gameCode && data.index >= 0) {
         let game = await Game.findOne({ gameCode: data.gameCode });
-        game.queries[data.index].type = null;
-        game.queries[data.index].answer = null;
-        game.teacherSocket = socket.id
+         //game.queries[data.index].type = null;
+         //game.queries[data.index].answer = null;
+
+         //remove the last question
+        game.queries.pop()
         game.markModified("queries")
+        //update teacher socket
+        game.teacherSocket = socket.id
+
+        //update student responses
+        game.roster.forEach(student => student.responses.pop())
         await game.save();
         let returnData = await GetGameData(data.gameCode);
         gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
