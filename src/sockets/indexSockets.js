@@ -429,15 +429,19 @@ const setUpSockets = (app) => {
         team.score += data.point;
         game.markModified("teams");
         await game.save();
-        //console.log("saved points earned, ", team.score);
+        console.log("saved points earned, ", team.score);
         let studentUpdate = {
           team: data.team,
           score: team.score,
         };
+        let returnData = await GetGameData(data.gameCode);
+
+        gameSocket.to(game.gameCode).emit("teamPoint", returnData);
+
         //I am going to try to set up the socket to simply relay point changes to students
         //I dont necessarily want to always pull all the game data if we dont need to.
         //Instead what I want to do is simply update the componenets that need to change (on the student end)
-        gameSocket.in(data.gameCode).emit("teamPointUpdate", studentUpdate);
+        console.log("the student update was ", studentUpdate, game.gameCode)
       }
     });
     socket.on("awardPoints", async (data) => {
