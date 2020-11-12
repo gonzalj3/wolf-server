@@ -164,7 +164,7 @@ const setUpSockets = (app) => {
           console.log("student found is : ", student)
           //socket back an update on color which is the team color listedi in teamTo.color
           let newTeamData = {
-            color:teamTo.name
+            color:teamTo.color
           }
           //socket.emit("colorUpdate", newTeamData)
           gameSocket.to(student.socket).emit("colorUpdate", newTeamData);
@@ -210,7 +210,7 @@ const setUpSockets = (app) => {
       if (game.teams.length == 1) {
         const yellow = await Team.create({
           students: [],
-          color: "yellow",
+          color: "#EEE657",
           name: "yellow",
           score: 0,
         });
@@ -226,7 +226,7 @@ const setUpSockets = (app) => {
       } else if (game.teams.length == 2) {
         const red = await Team.create({
           students: [],
-          color: "red",
+          color: "#F56043",
           name: "red",
           score: 0,
         });
@@ -241,7 +241,7 @@ const setUpSockets = (app) => {
       } else if (game.teams.length == 3) {
         const green = await Team.create({
           students: [],
-          color: "green",
+          color: "#3DC990",
           name: "green",
           score: 0,
         });
@@ -290,6 +290,8 @@ const setUpSockets = (app) => {
       console.log("to : ", socket.id)
 
       //game.teacherSocket = socket.id
+      game.lastAction = "new"
+
       await game.save();
       let returnData = await GetGameData(data.gameCode);
       gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
@@ -315,6 +317,8 @@ const setUpSockets = (app) => {
           }
 
           console.log("here is the last question : ", lastQuestion);
+          game.lastAction = "stop"
+
           //May just remove teh queries for each student since we already store data.
           await game.save();
           let returnData = await GetGameData(data.gameCode);
@@ -407,12 +411,14 @@ const setUpSockets = (app) => {
 
          //remove the last question
         game.queries.pop()
+        game.lastAction = "cancel"
         game.markModified("queries")
         //update teacher socket
         game.teacherSocket = socket.id
 
         //update student responses
         game.roster.forEach(student => student.responses.pop())
+        game.markModified("roster")
         await game.save();
         let returnData = await GetGameData(data.gameCode);
         gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
@@ -491,6 +497,8 @@ const setUpSockets = (app) => {
             }
           }
         }
+        game.lastAction = "point"
+
         await game.save();
         let returnData = await GetGameData(data.gameCode);
         //Need to change the code below.
@@ -512,7 +520,7 @@ const setUpSockets = (app) => {
           //Create new team
           let blue = await Team.create({
             students: [],
-            color: "blue",
+            color: "#3382C9",
             name: "blue",
             score: 0,
           })

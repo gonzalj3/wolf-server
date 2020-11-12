@@ -66,7 +66,7 @@ const registerController = async (req, res, next) => {
       console.log("we are about to create team");
       const blue = await Team.create({
         students: [],
-        color: "blue",
+        color: "#3382C9",
         name: "blue",
         score: 0,
       });

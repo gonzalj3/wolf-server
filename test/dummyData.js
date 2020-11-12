@@ -13,7 +13,7 @@ connectDB().then(async () => {
 
   const team = await Team.create({
     students: [player.name],
-    color: "blue",
+    color: "#3382C9",
     name: "blue",
     score: 2,
   });

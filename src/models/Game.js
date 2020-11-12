@@ -17,6 +17,9 @@ const Game = new mongoose.Schema({
   teacherSocket: {
     type: String,
   },
+  lastAction: {
+    type: String,
+  },
   //The declaration for roster originally was roster:[Player.schema]
   roster: [Player.schema],
   teams: [Team.schema],
