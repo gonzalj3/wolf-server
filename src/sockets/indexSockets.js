@@ -527,11 +527,29 @@ const setUpSockets = (app) => {
             name: "blue",
             score: 0,
           })
+          const yellow = await Team.create({
+            students: [],
+            color: "#EEE657",
+            name: "yellow",
+            score: 0,
+          });
+          const red = await Team.create({
+            students: [],
+            color: "#F56043",
+            name: "red",
+            score: 0,
+          });
+          const green = await Team.create({
+            students: [],
+            color: "#3DC990",
+            name: "green",
+            score: 0,
+          });
           //Create new game
           let newGame = await Game.create({
             gameCode: currentCode,
             roster: [],
-            teams: [blue],
+            teams: [blue,yellow,red,green],
             queries: [],
           })
 
