@@ -298,7 +298,6 @@ const setUpSockets = (app) => {
     });
     socket.on("setAnswer", async (data) => {
       /* Determine type of question, find game and the last query from queries array. 
-      Update the game with new answer and update this for each student as well. 
       Websocket to all the students in teh room with new data. 
       */
       switch (data.type) {
@@ -309,7 +308,7 @@ const setUpSockets = (app) => {
           console.log("here is the last question : ", lastQuestion);
 
           if (lastQuestion) {
-            lastQuestion.answer = data.answer;
+            //lastQuestion.answer = data.answer;
             lastQuestion.scored = 'true';
             game.markModified("queries")
             await game.save();
@@ -317,7 +316,11 @@ const setUpSockets = (app) => {
           }
 
           console.log("here is the last question : ", lastQuestion);
-          game.lastAction = "stop"
+          if(game.lastAction === "stop"){
+            game.lastAction = "new"
+          } else {
+            game.lastAction = "stop"
+          }
 
           //May just remove teh queries for each student since we already store data.
           await game.save();
