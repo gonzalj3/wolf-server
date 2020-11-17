@@ -79,6 +79,7 @@ const setUpSockets = (app) => {
         newUser.responses.push(null);
       });
       //await newUser.save();
+      console.log("this is gamefound : ", gameFound)
       let game = await Game.findOneAndUpdate(
         { gameCode: data.room },
         {
@@ -309,9 +310,9 @@ const setUpSockets = (app) => {
 
           if (lastQuestion) {
             //lastQuestion.answer = data.answer;
-            lastQuestion.scored = 'true';
-            game.markModified("queries")
-            await game.save();
+            //lastQuestion.scored = 'true';
+            //game.markModified("queries")
+            //await game.save();
 
           }
 
