@@ -59,7 +59,7 @@ const setUpSockets = (app) => {
             console.log("A player with that name already exists in the game.");
             gameFound.roster[index].socket = socket.id
             gameFound.markModified("roster")
-            await gameFound.save()
+            await gameFound.save().catch(error => { console.log("we have an error : ", error)})
             let returnData = await GetGameData(data.room);
             gameSocket.to(socket.id).emit("welcome", returnData)
             return;
