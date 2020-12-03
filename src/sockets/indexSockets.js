@@ -484,28 +484,29 @@ const setUpSockets = (app) => {
           console.log(`this is the team target ${team[0]}`)
           if(team[0] && !teamPoints[team[0].name]){
             teamPoints[team[0].name] = {name:team[0].name}
-          }
-          let players = teamPoints[team[0].name]["players"] + 1 || 1
-          teamPoints[team[0].name] = 
-          {
-            ...teamPoints[team[0].name],
-            players: players,
+          
+            let players = teamPoints[team[0].name]["players"] + 1 || 1
+            teamPoints[team[0].name] = 
+            {
+              ...teamPoints[team[0].name],
+              players: players,
 
-          }
-          console.log(`updated teamPoints at ${team[0].name} to ${teamPoints[team[0].name].players} and players is ${players}`)
-          //Ensure the student answered the question
-          if (student.responses[data.index]) {
-            //Ensure the answer is correct
-            if (data.answer == student.responses[data.index]) {
+            }
+            console.log(`updated teamPoints at ${team[0].name} to ${teamPoints[team[0].name].players} and players is ${players}`)
+            //Ensure the student answered the question
+            if (student.responses[data.index]) {
+              //Ensure the answer is correct
+              if (data.answer == student.responses[data.index]) {
 
-              //Ensure that we have a team to assign points to.
-              if (team[0]) {                  
-                teamPoints[team[0].name] = 
-                  {
-                    ...teamPoints[team[0].name],
-                    correct: teamPoints[team[0].name]["correct"] + 1 || 1
-                  }
-                  console.log("have updated teamPoints : ", team[0], teamPoints[team[0].name])
+                //Ensure that we have a team to assign points to.
+                if (team[0]) {                  
+                  teamPoints[team[0].name] = 
+                    {
+                      ...teamPoints[team[0].name],
+                      correct: teamPoints[team[0].name]["correct"] + 1 || 1
+                    }
+                    console.log("have updated teamPoints : ", team[0], teamPoints[team[0].name])
+                }
               }
             }
           }
