@@ -482,9 +482,10 @@ const setUpSockets = (app) => {
           })
           //Use the team name to find team/key in teamPoints object and then assign to that team's player property either 1 or 1 Plus existing number
           console.log(`this is the team target ${team[0]}`)
-          if(team[0] && !teamPoints[team[0].name]){
+          if(team[0]){
+            if(!teamPoints[team[0].name]){
             teamPoints[team[0].name] = {name:team[0].name}
-          
+            }
             let players = teamPoints[team[0].name]["players"] + 1 || 1
             teamPoints[team[0].name] = 
             {
