@@ -1,15 +1,15 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import { connectDB } from "./models/index.js";
-import { setUpSockets } from "./sockets/indexSockets.js";
-import { errorHandler } from "./util/errorResponse.js";
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { connectDB } from './models/index.js';
+import { setUpSockets } from './sockets/indexSockets.js';
+import { errorHandler } from './util/errorResponse.js';
 
-import cookieParser from "cookie-parser";
+import cookieParser from 'cookie-parser';
 
-import router from "./routes/autRoutes.js";
-import gameRouter from "./routes/game.js";
-import joinGameRouter from "./routes/joinGame.js";
+import router from './routes/autRoutes.js';
+import gameRouter from './routes/game.js';
+import joinGameRouter from './routes/joinGame.js';
 
 const { json, urlencoded } = express;
 
@@ -17,20 +17,21 @@ dotenv.config();
 
 const app = express();
 const whitelist = [
-  "http://localhost:3000",
-  "http://172.20.10.4",
-  "http://172.20.10.4:3000",
-  "http://192.168.1.38",
-  "http://192.168.1.38:3000",
-  "https://testwolffe.herokuapp.com",
-  "https://devwolfgame.herokuapp.com",
+  'http://localhost:3000',
+  'http://172.20.10.4',
+  'http://172.20.10.4:3000',
+  'http://192.168.1.38',
+  'http://192.168.1.38:3000',
+  'https://testwolffe.herokuapp.com',
+  'https://devwolfgame.herokuapp.com',
+  'http://testwolffe.herokuapp.com',
 ];
 var corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
@@ -60,9 +61,9 @@ app.use(cookieParser());
 app.use(json());
 app.use(urlencoded({ extended: true }));
 
-app.use("/api", router);
-app.use("/api/game/", gameRouter);
-app.use("/api/joinGame/", joinGameRouter);
+app.use('/api', router);
+app.use('/api/game/', gameRouter);
+app.use('/api/joinGame/', joinGameRouter);
 app.use(errorHandler);
 
 connectDB().then(async () => {
