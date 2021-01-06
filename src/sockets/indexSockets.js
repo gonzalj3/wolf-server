@@ -442,8 +442,8 @@ const setUpSockets = (app) => {
           gameCode: data.gameCode,
         });
         let team = game.teams.find((team) => team._id == data.team);
-        //We will update teh team score property by one point.
-        team.score += bonusPoint;
+        //We will update teh team score property by what is designated on the front end. Probably should more centralize the point system.
+        team.score += data.point;
         game.markModified('teams');
         await game.save();
         console.log('saved points earned, ', team.score);
