@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import Query from "../models/Query.js";
+import mongoose from 'mongoose';
+import Query from '../models/Query.js';
 
 /* @desc: The Player schema.
  */
@@ -7,7 +7,7 @@ import Query from "../models/Query.js";
 const Player = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, "is required"],
+    required: [true, 'is required'],
   },
   team: {
     type: String,
@@ -28,8 +28,12 @@ const Player = new mongoose.Schema({
   socket: {
     type: String,
   },
+  handRaised: {
+    type: Boolean,
+    default: false,
+  },
 });
-export default mongoose.model("Player", Player);
+export default mongoose.model('Player', Player);
 /* @desc: Before saving the user instance/document the password is hashed.
  * @param: next
  * @returns: none

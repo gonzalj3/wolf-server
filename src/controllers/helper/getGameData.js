@@ -1,7 +1,7 @@
-import Game from "../../models/Game.js";
-import Teacher from "../../models/Teacher.js";
-import Team from "../../models/Team.js";
-import { ErrorResponse } from "../../util/errorResponse.js";
+import Game from '../../models/Game.js';
+import Teacher from '../../models/Teacher.js';
+import Team from '../../models/Team.js';
+import { ErrorResponse } from '../../util/errorResponse.js';
 
 const GetGameData = async (gameCode) => {
   let gameFound = null;
@@ -34,10 +34,11 @@ const GetGameData = async (gameCode) => {
     returnData.students[element.id] = {
       id: element.id,
       name: element.name,
+      hand: element.handRaised,
     };
   });
-  returnData.droppable["roster"] = {
-    id: "roster",
+  returnData.droppable['roster'] = {
+    id: 'roster',
   };
   //Begin the process to populate  the students array inside the droppable roster object.
   returnData.droppable.roster.students = [];
@@ -58,7 +59,7 @@ const GetGameData = async (gameCode) => {
     returnData.question = null;
   }
   //Passing Last Question Action.
-  returnData.lastAction =  gameFound.lastAction
+  returnData.lastAction = gameFound.lastAction;
 
   //Returning all current game query responses, by first checking that we have a current question in progress.
   //console.log("queries : ", gameFound.queries);
@@ -69,7 +70,7 @@ const GetGameData = async (gameCode) => {
     returnData.responses = [];
     gameFound.roster.forEach((item, index) => {
       //ensure that a response exists for the current query and if so provide it to the teachers front end to print out
-      let teamName = "";
+      let teamName = '';
       if (item.team != null) {
         teamName = item.team;
       }
