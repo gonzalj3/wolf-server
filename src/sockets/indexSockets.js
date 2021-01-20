@@ -7,7 +7,7 @@ import Team from "../models/Team.js";
 import Player from "../models/Player.js";
 import Query from "../models/Query.js";
 import GetGameData from "../controllers/helper/getGameData.js";
-import cors from "cors";
+import RemoveHands from "../controllers/helper/removeHands.js";
 import Teacher from "../models/Teacher.js";
 import { randomGameCode } from "../util/randomGameCode.js";
 
@@ -428,6 +428,7 @@ const setUpSockets = (app) => {
 
         //update student responses
         game.roster.forEach((student) => student.responses.pop());
+        game.roster = RemoveHands(game.roster);
         game.markModified("roster");
         await game.save();
         let returnData = await GetGameData(data.gameCode);
