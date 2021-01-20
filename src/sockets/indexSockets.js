@@ -300,7 +300,8 @@ const setUpSockets = (app) => {
 
       //game.teacherSocket = socket.id
       game.lastAction = "new";
-
+      RemoveHands(game.roster);
+      game.markModified("roster");
       await game.save();
       let returnData = await GetGameData(data.gameCode);
       gameSocket.in(data.gameCode).emit("newQuestionUpdate", returnData);
@@ -329,10 +330,12 @@ const setUpSockets = (app) => {
           } else {
             game.lastAction = "stop";
           }
-
+          console.log("the roster is now : ", game.roster);
+          game.markModified("roster");
           //May just remove teh queries for each student since we already store data.
           await game.save();
           let returnData = await GetGameData(data.gameCode);
+          console.log(" the return data is : ", returnData);
           //Need to change the code below.
           gameSocket.in(data.gameCode).emit("setAnswerUpdate", returnData);
       }
@@ -428,7 +431,7 @@ const setUpSockets = (app) => {
 
         //update student responses
         game.roster.forEach((student) => student.responses.pop());
-        game.roster = RemoveHands(game.roster);
+        console.log("the game roster is       :", game.roster);
         game.markModified("roster");
         await game.save();
         let returnData = await GetGameData(data.gameCode);
@@ -548,7 +551,7 @@ const setUpSockets = (app) => {
           }
         }
         //console.log(`the team players ${teamPoints}, and the number correct ${teamPoints.correct}`)
-
+        game.markModified("roster");
         game.lastAction = "point";
 
         await game.save();

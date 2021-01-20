@@ -1,5 +1,8 @@
 const RemoveHands = async (students) => {
-  return students.map((student) => (student.handRaised = false));
+  for (let student of students) {
+    console.log(student);
+    student.handRaised = false;
+  }
 };
 
 export default RemoveHands;
